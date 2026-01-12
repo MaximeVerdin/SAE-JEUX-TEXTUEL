@@ -1,46 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-char *readParam(const char *filePath, const char *paramName)
-{
-    char buffer[256];
-    FILE *file = fopen(filePath, "r");
-    if (!file)
-        return NULL;
-
-    // Read file line by line
-    while (fgets(buffer, sizeof(buffer), file))
-    {
-        // parametre searching
-        char *colon = strchr(buffer, ':');
-        if (!colon)
-            continue;
-
-        *colon = '\0';
-        char *key = buffer;
-        char *value = colon + 1;
-
-        // Trim leading spaces
-        while (*value == ' ' || *value == '\t')
-            value++;
-
-        value[strcspn(value, "\r\n")] = '\0';
-
-        if (strcmp(key, paramName) == 0)
-        {
-            char *result = malloc(strlen(value) + 1);
-            if (result)
-                strcpy(result, value);
-
-            fclose(file);
-            return result;
-        }
-    }
-
-    fclose(file);
-    return NULL;
-}
+#include "utils.h"
+#include "saveManagement.h"
+#include "player.h"
 
 void gameMenu()
 {
@@ -88,6 +51,56 @@ void gameMenu()
         printf("1. %s\n", loadGame ? loadGame : "Load Game");
         scanf("%d", &choice);
     } while (choice < 0 || choice > 1);
+    if (choice == 0)
+    {
+        char name[50];
+        int difficultyChoice = 0;
+        int skipTutorialChoice = 0;
+        int playerCount = 1;
+
+        if (multiplayer == 1)
+        {
+            printf("Enter the number of player: ");
+            scanf("%d", &playerCount);
+        }
+
+        Player *players = NULL;
+        players = malloc(playerCount * sizeof(Player));
+
+        for (int i = 0; i < playerCount; i++)
+        {
+            printf("Enter your character's name: ");
+            scanf("%s", players[i].name);
+            // Initialize default stats
+            players[i].vie = 100;
+            players[i].attack = 10;
+            players[i].luck = 5;
+            strcpy(players[i].weapon, "Hands");
+        }
+
+        do
+        {
+            printf("Select difficulty:\n");
+            for (int i = 0; i < 3; i++)
+            {
+                printf("%d. %s\n", i, difficulty[i] ? difficulty[i] : "Difficulty");
+            }
+            scanf("%d", &difficultyChoice);
+        } while (difficultyChoice < 0 || difficultyChoice > 2);
+
+        do
+        {
+            printf("0. No %s\n", skipTutorial ? skipTutorial : "Skip Tutorial");
+            printf("1. Yes %s\n", skipTutorial ? skipTutorial : "Skip Tutorial");
+            scanf("%d", &skipTutorialChoice);
+        } while (skipTutorialChoice < 0 || skipTutorialChoice > 1);
+        createGame(name, multiplayer, difficultyChoice, skipTutorialChoice);
+        printf("New game created for %s!\n", name);
+    }
+    else
+    {
+        printf("Load game feature is not implemented yet.\n");
+    }
 }
 
 int main()
