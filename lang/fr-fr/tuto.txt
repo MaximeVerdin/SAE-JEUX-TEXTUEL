@@ -1,0 +1,55 @@
+Bienvenue dans [nomjeu], devant vous se dresse une aventure épanouissante, mais inexpérimenté que vous êtes, vous avez besoin de MES conseils !
+
+On commence avec "Comment vous servir de vos petites jambes fébriles ?", si vous souhaitez vous déplacer à gauche par exemple, vous devez penser très fort à la lettre 'Q' ou appuyer sur la touche 'Q' de votre clavier imaginaire provenant de votre faible cerveau.
+
+Si vous avez au moins 1 neurone, vous pouvez faire de même avec 'D' pour vous déplacer à droite, 'Z' pour aller vers le haut et 'S' pour vous mouvoir vers le bas.
+
+Très bien, je vous laisse vous balader, moi je vais me faire un café, je reviens...
+
+$trouve_le_coffre$
+
+Oh le coffre de mon grand-père ! Il me manque tellement... Sinon tu vas rester planté là encore longtemps ? Ouvres-le pardi ! T'es sérieux là ? Tu sais pas ouvrir un simple coffre ?
+Il te suffit de réfléchir à la touche "F", faut vraiment tout t'apprendre !
+
+$ouvre_le_coffre$
+$piège s'active$
+
+Une flèche arrive sur vous ! Aïe ! Ça doit faire mal !
+
+Sacré papy, toujours aussi farceur à ce que je vois. 
+
+Oh, mon Dieu ! Il vous a laissé l'épée divine, "L'Excaliburne", elle appartenait au brave chevalier Pilou.
+
+*Bruit de mécanique au loin, qui ressemble à une porte*
+$ouvre_porte_tuto$
+
+$aperçoit_ennemi_tuto$
+
+Ah bah, on a enfin de la compagnie ! Je commençais à m'ennuyer avec toi. Bon, bah t'as une épée, t'as un adversaire, il y a plus qu'à !
+
+Bien, maintenant que vous avez les mêmes capacités qu'un escargot, moi, le seul, l'unique, je vais vous apprendre à vous battre !
+
+Pour cela, tu as 2 choix qui s'opposent à toi, soit tu attaques, soit tu bloques. Après vu la mauviette que tu es, tu vas certainement vouloir t'enfuir. C'est un choix mais je t'oblige à te battre pour cette fois.
+
+"E" te servira pour attaquer, "R" pour bloquer les attaques reçues et "A" pour fuir le combat (pas la peine d'essayer).
+
+Bon courage brave soldat, tu en es presque capable...
+
+$lance_combat_tuto$
+
+$fin_combat_tuto$
+
+Félicitations, tu as battu l'adversaire le plus pourri du monde !
+Je pense que la sortie devrait être plus loin...
+
+$apperçoit_boss_tuto$
+
+J'aime beaucoup ta naïveté, ça me divertit beaucoup !
+Voici votre adversaire, [nom_du_boss_tuto] ! Le plus redoutable des [races_du_boss_tuto] !
+Battez-le, et je vous donne la liberté !
+
+$lance_combat_boss_tuto$
+
+$fin_combat_boss_tuto$
+
+La sortie est devant toi champion, fonce ! Une aventure infinissable est devant toi ! Bon courage, je suis si fier de toi !
