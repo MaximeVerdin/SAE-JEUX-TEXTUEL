@@ -1,81 +1,124 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "gameMenu.h"
 #include "utils.h"
 #include "saveManagement.h"
 #include "player.h"
+#include "playGame.h"
 
 void gameMenu()
 {
-
     int choice = 0;
     int multiplayer = 0;
-    char *language = "en";
-    char *menuFilePath = "menu.txt";
-    printf("Select a language:\n");
+    char language[10] = "en";
+    char menuFilePath[100];
+    char gameName[50] = "Game";
+    char gameMode[50] = "Adventure";
+    char newGame[50] = "New Game";
+    char loadGame[50] = "Load Game";
+    char skipTutorial[50] = "Skip Tutorial";
+    char *difficulty[3] = {NULL, NULL, NULL};
+    char *param;
+
+    printf("Select a language (en/fr): ");
     scanf("%s", language);
+
     if (strcmp(language, "fr") == 0)
     {
-        menuFilePath = strcat("../lang/fr-fr", menuFilePath);
+        strcpy(menuFilePath, "lang/fr-fr/menu.txt");
     }
     else
     {
-        menuFilePath = strcat("../lang/en-gb", menuFilePath);
+        strcpy(menuFilePath, "lang/en-gb/menu.txt");
     }
 
-    char *gameName = readParam(menuFilePath, "gameName");
+    param = readParam(menuFilePath, "gameName");
+    if (param != NULL)
+    {
+        strcpy(gameName, param);
+        free(param);
+    }
 
-    char *gameMode = readParam(menuFilePath, "gameMode");
+    param = readParam(menuFilePath, "gameMode");
+    if (param != NULL)
+    {
+        strcpy(gameMode, param);
+        free(param);
+    }
 
-    char *newGame = readParam(menuFilePath, "newGame");
-    char *loadGame = readParam(menuFilePath, "loadGame");
+    param = readParam(menuFilePath, "newGame");
+    if (param != NULL)
+    {
+        strcpy(newGame, param);
+        free(param);
+    }
 
-    char *skipTutorial = readParam(menuFilePath, "skipTutorial");
+    param = readParam(menuFilePath, "loadGame");
+    if (param != NULL)
+    {
+        strcpy(loadGame, param);
+        free(param);
+    }
 
-    char *difficulty[3];
+    param = readParam(menuFilePath, "skipTutorial");
+    if (param != NULL)
+    {
+        strcpy(skipTutorial, param);
+        free(param);
+    }
+
     difficulty[0] = readParam(menuFilePath, "easyDifficulty");
     difficulty[1] = readParam(menuFilePath, "mediumDifficulty");
     difficulty[2] = readParam(menuFilePath, "hardDifficulty");
 
-    printf("=== %s ===\n", gameName ? gameName : "Game");
-    printf("mode: %s\n", gameMode ? gameMode : "SOLO MODE / COOP MODE");
+    printf("=== %s ===\n", gameName);
+    printf("Mode: %s\n", gameMode);
+
     do
     {
         printf("0. Solo Mode\n");
         printf("1. Coop Mode\n");
         scanf("%d", &multiplayer);
     } while (multiplayer < 0 || multiplayer > 1);
+
     do
     {
-        printf("0. %s\n", newGame ? newGame : "New Game");
-        printf("1. %s\n", loadGame ? loadGame : "Load Game");
+        printf("0. %s\n", newGame);
+        printf("1. %s\n", loadGame);
         scanf("%d", &choice);
     } while (choice < 0 || choice > 1);
+
     if (choice == 0)
     {
-        char name[50];
+        char saveName[50];
         int difficultyChoice = 0;
         int skipTutorialChoice = 0;
         int playerCount = 1;
 
         if (multiplayer == 1)
         {
-            printf("Enter the number of player: ");
+            printf("Enter the number of player (max 4): ");
             scanf("%d", &playerCount);
+            if (playerCount > 4)
+                playerCount = 4;
+            if (playerCount < 1)
+                playerCount = 1;
         }
 
-        Player *players = NULL;
-        players = malloc(playerCount * sizeof(Player));
+        Player *players = malloc(playerCount * sizeof(Player));
+        if (players == NULL)
+        {
+            printf("Memory allocation error!\n");
+            return;
+        }
 
         for (int i = 0; i < playerCount; i++)
         {
+            char name[50];
             printf("Enter your character's name: ");
-            scanf("%s", players[i].name);
-            // Initialize default stats
-            players[i].vie = 100;
-            players[i].attack = 10;
-            players[i].luck = 5;
-            strcpy(players[i].weapon, "Hands");
+            scanf("%s", name);
+            players[i] = createPlayer(name, 100, 10, 5, "Hands", NULL, 0);
         }
 
         do
@@ -90,21 +133,53 @@ void gameMenu()
 
         do
         {
-            printf("0. No %s\n", skipTutorial ? skipTutorial : "Skip Tutorial");
-            printf("1. Yes %s\n", skipTutorial ? skipTutorial : "Skip Tutorial");
+            printf("0. No %s\n", skipTutorial);
+            printf("1. Yes %s\n", skipTutorial);
             scanf("%d", &skipTutorialChoice);
         } while (skipTutorialChoice < 0 || skipTutorialChoice > 1);
-        createGame(name, multiplayer, difficultyChoice, skipTutorialChoice);
-        printf("New game created for %s!\n", name);
+
+        printf("Enter a name for your save: ");
+        scanf("%s", saveName);
+
+        createGame(saveName, multiplayer, difficultyChoice, skipTutorialChoice);
+        addPlayersToSave(saveName, players, playerCount);
+
+        printf("New game created for %s!\n", saveName);
+
+        if (loadGameByName(saveName) != 0)
+        {
+            printf("Loading error!\n");
+        }
+        else
+        {
+            playGame(saveName);
+        }
+
+        for (int i = 0; i < playerCount; i++)
+        {
+            freePlayerAbilities(&players[i]);
+        }
+        free(players);
     }
     else
     {
-        printf("Load game feature is not implemented yet.\n");
-    }
-}
+        printf("Enter the name of your saved game: ");
+        char saveName[50];
+        scanf("%s", saveName);
 
-int main()
-{
-    gameMenu();
-    return 0;
+        if (loadGameByName(saveName) != 0)
+        {
+            printf("Loading error!\n");
+        }
+        else
+        {
+            playGame(saveName);
+        }
+    }
+
+    // Libérer la mémoire
+    for (int i = 0; i < 3; i++)
+    {
+        free(difficulty[i]);
+    }
 }

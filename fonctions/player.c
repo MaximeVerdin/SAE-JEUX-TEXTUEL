@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <string.h>
-#include "ability.h"
 #include "player.h"
 
 void damagePlayer(Player *player, int damage)
@@ -40,7 +39,7 @@ void displayPlayer(const Player *player)
     printf("Attack: %d\n", player->attack);
     printf("Luck: %d\n", player->luck);
     printf("Weapon: %s\n", player->weapon);
-    printf("Skills:\n");
+    printf("Skills: %d\n", player->skillCount);
     for (int i = 0; i < player->skillCount; i++)
     {
         displayAbility(&player->skills[i]);
@@ -63,4 +62,26 @@ void freePlayerAbilities(Player *player)
     free(player->skills);
     player->skills = NULL;
     player->skillCount = 0;
+}
+
+Player createPlayer(char name[50], int vie, int attack, int luck, char weapon[50], Ability *skills, int skillCount)
+{
+    Player player;
+    strncpy(player.name, name, sizeof(player.name) - 1);
+    player.name[sizeof(player.name) - 1] = '\0';
+    player.vie = vie;
+    player.attack = attack;
+    player.luck = luck;
+    strncpy(player.weapon, weapon, sizeof(player.weapon) - 1);
+    player.weapon[sizeof(player.weapon) - 1] = '\0';
+
+    player.skillCount = 0;
+    player.skills = NULL;
+
+    for (int i = 0; i < skillCount; i++)
+    {
+        addAbility(&player, skills[i]);
+    }
+
+    return player;
 }

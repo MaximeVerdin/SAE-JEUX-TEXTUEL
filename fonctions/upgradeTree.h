@@ -1,8 +1,11 @@
+#ifndef UPGRADETREE_H
+#define UPGRADETREE_H
+
 #include "upgrade.h"
 
-typedef struct 
-{
-    Upgrade upgrade;
-    struct UpgradeNode *left;
-    struct UpgradeNode *right;
-} UpgradeNode;
+// Fonctions pour l'arbre d'amélioration
+UpgradeNode *createUpgradeNode(Upgrade upgrade);
+void freeUpgradeTree(UpgradeNode *root);
+void displayUpgradeTree(UpgradeNode *root);
+
+#endif
