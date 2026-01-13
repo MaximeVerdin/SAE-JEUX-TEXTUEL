@@ -1,0 +1,22 @@
+gameName: GAME NAME
+
+gameLanguage: EN
+
+gameMode: SOLO / COOP
+
+newGame: NEW GAME
+
+
+loadGame: LOAD GAME
+saveGame: SAVE GAME
+
+skipTutorial: SKIP TUTORIAL
+
+easyDifficulty: EASY DIFFICULTY
+mediumDifficulty: MEDIUM DIFFICULTY
+hardDifficulty: HARD DIFFICULTY
+
+name: NAME
+class: CLASS
+
+

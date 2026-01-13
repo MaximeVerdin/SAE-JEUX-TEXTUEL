@@ -1,0 +1,21 @@
+gameName: NOM DU JEU
+
+gameLanguage: FR
+
+gameMode: SOLO / COOP
+
+newGame: NOUVELLE PARTIE
+
+loadGame: CHARGER PARTIE
+saveGame: SAUVEGARDER PARTIE
+
+skipTutorial: PASSER TUTORIEL
+
+easyDifficulty: DIFFICULTÉ FACILE
+mediumDifficulty: DIFFICULTÉ INTERMÉDIAIRE
+hardDifficulty: DIFFICULTÉ AVANCÉE
+
+name: NOM
+class: CLASSE
+
+
