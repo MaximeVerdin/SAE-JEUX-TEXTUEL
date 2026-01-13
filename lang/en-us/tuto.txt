@@ -1,0 +1,56 @@
+Welcome to [game_name]. A fulfilling adventure lies ahead of you, but as you are inexperienced, you need MY advice !
+
+Let's start with ‘How to use your little shaky legs.’ If you want to move to the left, for example, you must think very hard about the letter “Q” or press the “Q” key on your imaginary keyboard coming from your weak brain.
+
+If you have at least one brain cell, you can do the same with “D” to move right, “Z” to move up, and “S” to move down.
+
+All right, I'll leave you to wander around while I make myself a cup of tea. I'll be right back...
+
+$find_the_chest$
+
+Oh, my grandfather's chest! I miss him so much... Are you just going to stand there for much longer? Open it, for goodness' sake! Are you serious ?! You don't know how to open a simple chest ?
+Just think of the “F” key. Do I really have to teach you everything?
+
+$open_the_chest$
+$trap_activates$
+
+An arrow is flying towards you ! Ouch ! That must hurt !
+
+Good old grandad, still as mischievous as ever, I see. 
+
+Oh my God! He left you the divine sword, ‘Excaliball’, which belonged to the brave knight Pilou.
+
+*Distant mechanical noise, like a door opening*
+
+$open_door_tutorial$
+
+$spot_enemy_tuto$
+
+Ah well, we finally have some company ! I was starting to get bored with just you. Right, so you've got a sword, you've got an opponent, let's do this  !
+
+Right, now that you have the same abilities as a snail, I, the one and only, am going to teach you how to fight !
+
+To do this, you have two choices: either you attack or you block. But seeing as you're such a wimp, you'll probably want to run away. That's your choice, but I'm forcing you to fight this time.
+
+Use ‘E’ to attack, “R” to block attacks, and ‘A’ to flee the fight (don't bother trying).
+
+Good luck, brave soldier, you're almost there...
+
+$start_fight_tutorial$
+
+$end_fight_tutorial$
+
+Congratulations, you've defeated the world's most pathetic opponent !
+I think the exit should be further away...
+
+$spot_boss_tutorial$
+
+I really like your naivety, it amuses me greatly !
+Here is your opponent, [name_boss_tutorial]! The most formidable of the [races_boss_tutorial] !
+Defeat him, and I'll give you your freedom !
+
+$start_tutorial_boss_fight$
+
+$end_tutorial_boss_fight$
+
+The exit is in front of you, champion, go for it ! An endless adventure lies ahead ! Good luck, I'm so proud of you !
