@@ -1,4 +1,4 @@
-Bienvenue dans [nomjeu], devant vous se dresse une aventure épanouissante, mais inexpérimenté que vous êtes, vous avez besoin de MES conseils !
+Bienvenue dans [game_name], devant vous se dresse une aventure épanouissante, mais inexpérimenté que vous êtes, vous avez besoin de MES conseils !
 
 On commence avec "Comment vous servir de vos petites jambes fébriles ?", si vous souhaitez vous déplacer à gauche par exemple, vous devez penser très fort à la lettre 'Q' ou appuyer sur la touche 'Q' de votre clavier imaginaire provenant de votre faible cerveau.
 
@@ -6,13 +6,13 @@ Si vous avez au moins 1 neurone, vous pouvez faire de même avec 'D' pour vous d
 
 Très bien, je vous laisse vous balader, moi je vais me faire un café, je reviens...
 
-$trouve_le_coffre$
+$find_the_chest$
 
 Oh le coffre de mon grand-père ! Il me manque tellement... Sinon tu vas rester planté là encore longtemps ? Ouvres-le pardi ! T'es sérieux là ? Tu sais pas ouvrir un simple coffre ?
 Il te suffit de réfléchir à la touche "F", faut vraiment tout t'apprendre !
 
-$ouvre_le_coffre$
-$piège s'active$
+$open_the_chest$
+$trap_activates$
 
 Une flèche arrive sur vous ! Aïe ! Ça doit faire mal !
 
@@ -35,21 +35,21 @@ Pour cela, tu as 2 choix qui s'opposent à toi, soit tu attaques, soit tu bloque
 
 Bon courage brave soldat, tu en es presque capable...
 
-$lance_combat_tuto$
+$start_fight_tutorial$
 
-$fin_combat_tuto$
+$end_fight_tutorial$
 
 Félicitations, tu as battu l'adversaire le plus pourri du monde !
 Je pense que la sortie devrait être plus loin...
 
-$apperçoit_boss_tuto$
+$spot_boss_tutorial$
 
 J'aime beaucoup ta naïveté, ça me divertit beaucoup !
-Voici votre adversaire, [nom_du_boss_tuto] ! Le plus redoutable des [races_du_boss_tuto] !
+Voici votre adversaire, [name_boss_tutorial] ! Le plus redoutable des [races_boss_tutorial] !
 Battez-le, et je vous donne la liberté !
 
-$lance_combat_boss_tuto$
+$start_tutorial_boss_fight$
 
-$fin_combat_boss_tuto$
+$end_tutorial_boss_fight$
 
 La sortie est devant toi champion, fonce ! Une aventure infinissable est devant toi ! Bon courage, je suis si fier de toi !
