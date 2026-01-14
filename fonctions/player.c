@@ -1,3 +1,5 @@
+/* Author names : VERDIN Maxime and FOURNIER Nathan */
+
 #include <stdio.h>
 #include <string.h>
 #include "player.h"

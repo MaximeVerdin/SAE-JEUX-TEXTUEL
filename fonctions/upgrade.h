@@ -1,3 +1,5 @@
+/* Author names : VERDIN Maxime and FOURNIER Nathan */
+
 #ifndef UPGRADE_H
 #define UPGRADE_H
 

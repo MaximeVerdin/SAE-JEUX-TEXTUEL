@@ -1,3 +1,5 @@
+/* Author names : VERDIN Maxime and FOURNIER Nathan */
+
 #ifndef ABILITY_H
 #define ABILITY_H
 

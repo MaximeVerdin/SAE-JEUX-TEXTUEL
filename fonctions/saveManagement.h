@@ -1,3 +1,5 @@
+/* Author names : VERDIN Maxime and FOURNIER Nathan */
+
 #ifndef SAVEMANAGEMENT_H
 #define SAVEMANAGEMENT_H
 

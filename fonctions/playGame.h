@@ -1,3 +1,5 @@
+/* Author names : VERDIN Maxime and FOURNIER Nathan */
+
 #ifndef PLAYGAME_H
 #define PLAYGAME_H
 
