@@ -26,9 +26,7 @@ Oh my God! He left you the divine sword, ‘Excalibur’, which belonged to the 
 
 $open_door_tutorial$
 
-$spot_enemy_tuto$
-
-Ah well, we finally have some company ! I was starting to get bored with just you. Right, so you've got a sword, you've got an opponent, let's do this  !
+Ah well, we finally have some company ! I was starting to get bored with just you. Right, so you've got a sword, let's do this !
 
 Right, now that you have the same abilities as a snail, I, the one and only, am going to teach you how to fight !
 
@@ -42,7 +40,7 @@ $start_fight_tutorial$
 
 $end_fight_tutorial$
 
-Congratulations, you've defeated the world's most pathetic opponent !
+Congratulations, you've defeated it! The mightiest of opponents...
 I think the exit should be further away...
 
 $spot_boss_tutorial$

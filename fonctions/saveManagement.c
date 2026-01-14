@@ -168,7 +168,7 @@ GameState loadGameState(const char *saveName)
     game.tutorialStep = 0;
 
     /* Create default player */
-    Player defaultPlayer = createPlayer("Hero", 100, 10, 5, "Hands", NULL, 0);
+    Player defaultPlayer = createPlayer("Hero", 100, 10, 5, "Hands");
     game.players[0] = defaultPlayer;
 
     /* Initialize dungeon */
@@ -354,10 +354,6 @@ GameState loadGameState(const char *saveName)
                 continue;
             strncpy(game.players[playerIdx].weapon, token, sizeof(game.players[playerIdx].weapon) - 1);
             game.players[playerIdx].weapon[sizeof(game.players[playerIdx].weapon) - 1] = '\0';
-
-            /* Initialize abilities */
-            game.players[playerIdx].skillCount = 0;
-            game.players[playerIdx].skills = NULL;
 
             /* Update player count */
             if (playerIdx + 1 > game.playerCount)

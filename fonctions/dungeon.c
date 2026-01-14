@@ -5,13 +5,15 @@
 #include "dungeon.h"
 #include "player.h"
 
-/* Tutorial dungeon layout (static 5x5 map) */
+/* Tutorial dungeon layout (static 5x5 map) - Simplified for focused learning
+ * Top area: Player (@) and chest (C) - no enemies, teaches chest mechanics
+ * Bottom area: Boss (B) and exit (X) - only boss for combat tutorial */
 static const char *tutorialMap[] = {
     "#####",
-    "#@C.#",
-    "#.###",
-    "#EBX#",
-    "#####"};
+    "#@ C#",
+    "# . #",
+    "# B #",
+    "# X #"};
 
 /**
  * @brief Generate the tutorial dungeon layout

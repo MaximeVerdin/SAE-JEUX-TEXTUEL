@@ -23,9 +23,7 @@ Oh, mon Dieu ! Il vous a laissé l'épée divine, "Excalibur", elle appartenait 
 *Bruit de mécanique au loin, qui ressemble à une porte*
 $ouvre_porte_tuto$
 
-$aperçoit_ennemi_tuto$
-
-Ah bah, on a enfin de la compagnie ! Je commençais à m'ennuyer avec toi. Bon, bah t'as une épée, t'as un adversaire, il y a plus qu'à !
+Ah bah, on a enfin de la compagnie ! Je commençais à m'ennuyer avec toi. Tu as ton épée, il y a plus qu'à !
 
 Bien, maintenant que vous avez les mêmes capacités qu'un escargot, moi, le seul, l'unique, je vais vous apprendre à vous battre !
 
@@ -39,7 +37,7 @@ $start_fight_tutorial$
 
 $end_fight_tutorial$
 
-Félicitations, tu as battu l'adversaire le plus pourri du monde !
+Félicitations, tu l'as battu ! Le plus puissant des adversaires...
 Je pense que la sortie devrait être plus loin...
 
 $spot_boss_tutorial$

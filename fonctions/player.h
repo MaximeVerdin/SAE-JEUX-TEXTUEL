@@ -4,7 +4,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "ability.h"
 
 /**
  * @brief Player structure representing the game character
@@ -19,8 +18,6 @@ typedef struct
     int attack;      /**< Player attack power */
     int luck;        /**< Player luck factor for critical hits */
     char weapon[50]; /**< Currently equipped weapon name */
-    Ability *skills; /**< Array of learned abilities */
-    int skillCount;  /**< Number of abilities learned */
 } Player;
 
 /**
@@ -65,19 +62,6 @@ void changeWeapon(Player *player, const char *newWeapon);
 void displayPlayer(const Player *player);
 
 /**
- * @brief Add a new ability to player's skill set
- * @param player Pointer to the player
- * @param newAbility The ability to add
- */
-void addAbility(Player *player, Ability newAbility);
-
-/**
- * @brief Free all dynamically allocated abilities
- * @param player Pointer to the player
- */
-void freePlayerAbilities(Player *player);
-
-/**
  * @brief Create a new player with specified attributes
  * @param name Player name
  * @param health Initial health points
@@ -88,6 +72,6 @@ void freePlayerAbilities(Player *player);
  * @param skillCount Number of starting abilities
  * @return Initialized Player structure
  */
-Player createPlayer(char name[50], int health, int attack, int luck, char weapon[50], Ability *skills, int skillCount);
+Player createPlayer(char name[50], int health, int attack, int luck, char weapon[50]);
 
 #endif
