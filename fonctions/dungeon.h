@@ -1,3 +1,5 @@
+/* Author names : VERDIN Maxime and FOURNIER Nathan */
+
 #ifndef DUNGEON_H
 #define DUNGEON_H
 

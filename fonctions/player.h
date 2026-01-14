@@ -1,3 +1,5 @@
+/* Author names : VERDIN Maxime and FOURNIER Nathan */
+
 #ifndef PLAYER_H
 #define PLAYER_H
 
