@@ -7,86 +7,6 @@
 #include "dungeon.h"
 #include "player.h"
 
-/* Tutorial dungeon layout (static 5x5 map) - Simplified for focused learning
- * Top area: Player (@) and chest (C) - no enemies, teaches chest mechanics
- * Bottom area: Boss (B) and exit (X) - only boss for combat tutorial */
-static const char *tutorialMap[] = {
-    "#####",
-    "#@ C#",
-    "# . #",
-    "# B #",
-    "# X #"};
-
-/**
- * @brief Generate the tutorial dungeon layout
- */
-void generateTutorialDungeon(Dungeon *dungeon)
-{
-    for (int i = 0; i < DUNGEON_SIZE; i++)
-    {
-        for (int j = 0; j < DUNGEON_SIZE; j++)
-        {
-            dungeon->grid[i][j] = WALL;
-            dungeon->visible[i][j] = 0;
-            dungeon->explored[i][j] = 0;
-        }
-    }
-
-    for (int i = 0; i < DUNGEON_SIZE; i++)
-    {
-        for (int j = 0; j < DUNGEON_SIZE && tutorialMap[i][j] != '\0'; j++)
-        {
-            char tile = tutorialMap[i][j];
-
-            switch (tile)
-            {
-            case '#':
-                dungeon->grid[i][j] = WALL;
-                break;
-            case '.':
-                dungeon->grid[i][j] = FLOOR;
-                break;
-            case '@':
-                dungeon->playerPos.x = j;
-                dungeon->playerPos.y = i;
-                dungeon->grid[i][j] = FLOOR;
-                break;
-            case 'C':
-                dungeon->grid[i][j] = CHEST;
-                dungeon->chests[0].x = j;
-                dungeon->chests[0].y = i;
-                dungeon->chestCount = 1;
-                dungeon->chestOpened = 0;
-                break;
-            case 'E':
-                dungeon->enemies[0].x = j;
-                dungeon->enemies[0].y = i;
-                dungeon->enemyCount = 1;
-                dungeon->grid[i][j] = FLOOR;
-                break;
-            case 'B':
-                dungeon->grid[i][j] = FLOOR;
-                dungeon->bossPos.x = j;
-                dungeon->bossPos.y = i;
-                break;
-            case 'X':
-                dungeon->exitPos.x = j;
-                dungeon->exitPos.y = i;
-                dungeon->grid[i][j] = EXIT;
-                break;
-            default:
-                dungeon->grid[i][j] = FLOOR;
-                break;
-            }
-        }
-    }
-
-    dungeon->enemyFound = 0;
-    dungeon->bossFound = 0;
-
-    updateVision(dungeon);
-}
-
 /**
  * @brief Initialize a new dungeon for the given level
  */
@@ -679,32 +599,6 @@ void placeRandomChests(Dungeon *dungeon)
                 p = 1;
             }
             attempts++;
-        }
-    }
-}
-
-/**
- * @brief Place tutorial elements
- */
-void placeTutorialElements(Dungeon *dungeon)
-{
-    int p = 0;
-    for (int i = 1; i < DUNGEON_SIZE - 1 && !p; i++)
-    {
-        for (int j = 1; j < DUNGEON_SIZE - 1 && !p; j++)
-        {
-            if (dungeon->grid[i][j] == FLOOR)
-            {
-                int dist = abs(i - dungeon->playerPos.y) + abs(j - dungeon->playerPos.x);
-                if (dist >= 3 && dist <= 8)
-                {
-                    dungeon->grid[i][j] = CHEST;
-                    dungeon->chests[0].x = j;
-                    dungeon->chests[0].y = i;
-                    dungeon->chestCount = 1;
-                    p = 1;
-                }
-            }
         }
     }
 }

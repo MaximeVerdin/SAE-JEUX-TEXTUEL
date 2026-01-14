@@ -59,9 +59,9 @@ typedef struct
     int chestCount;                           /**< Number of chests in dungeon */
     Position chests[5];                       /**< Array of chest positions */
     int chestOpened;                          /**< Flag if current chest opened */
-    int enemyFound;                           /**< Tutorial: enemy discovered */
-    int bossFound;                            /**< Tutorial: boss discovered */
-    Position bossPos;                         /**< Tutorial boss position */
+    int enemyFound;                           /**< Enemy discovered flag */
+    int bossFound;                            /**< Boss discovered flag */
+    Position bossPos;                         /**< Boss position */
 } Dungeon;
 
 /**
@@ -84,16 +84,6 @@ void initDungeon(Dungeon *dungeon, int level);
  * @param dungeon Pointer to the dungeon structure to populate
  */
 void generateDungeon(Dungeon *dungeon);
-
-/**
- * @brief Generate the tutorial dungeon layout
- *
- * Creates a fixed tutorial map designed to teach players
- * basic mechanics including movement, combat, and objectives.
- *
- * @param dungeon Pointer to the dungeon structure to initialize
- */
-void generateTutorialDungeon(Dungeon *dungeon);
 
 /**
  * @brief Display the dungeon grid in console
@@ -266,16 +256,6 @@ int openChest(Dungeon *dungeon, int x, int y);
 void placeRandomChests(Dungeon *dungeon);
 
 /**
- * @brief Place tutorial-specific elements
- *
- * Places a chest at a specific tutorial-appropriate location
- * for the tutorial gameplay sequence.
- *
- * @param dungeon Pointer to the tutorial dungeon
- */
-void placeTutorialElements(Dungeon *dungeon);
-
-/**
  * @brief Create an enemy with difficulty-based stats
  *
  * Generates a new enemy with health, attack, and experience
@@ -285,41 +265,5 @@ void placeTutorialElements(Dungeon *dungeon);
  * @return Initialized Enemy structure
  */
 Enemy createEnemy(int difficulty);
-
-/**
- * @brief Run a combat encounter between player and enemy
- *
- * Executes a turn-based combat loop where the player and
- * enemy exchange attacks until one is defeated.
- *
- * @param player Pointer to the player
- * @param enemy Pointer to the enemy
- * @return 1 if player wins, 0 if enemy wins
- */
-int combat(Player *player, Enemy *enemy);
-
-/**
- * @brief Run the tutorial combat encounter
- *
- * Special combat sequence for the tutorial that guides
- * the player through basic combat mechanics.
- *
- * @param player Pointer to the player
- * @return 1 if tutorial completed, 0 if failed
- */
-int fightTutorialEnemy(Player *player);
-
-/**
- * @brief Run a boss fight encounter
- *
- * Special boss combat with enhanced enemy stats and
- * unique boss name generation.
- *
- * @param player Pointer to the player
- * @param bossName Name of the boss type
- * @param race Boss race/classification
- * @return 1 if boss defeated, 0 if player fails
- */
-int fightBoss(Player *player, const char *bossName, const char *race);
 
 #endif

@@ -7,9 +7,13 @@
 #include "playGame.h"
 #include "player.h"
 #include "saveManagement.h"
-#include "upgradeTree.h"
 #include "dungeon.h"
 #include "utils.h"
+#include "items.h"
+
+/* Global weapons array loaded from CSV */
+static Weapon g_weapons[MAX_WEAPONS];
+static int g_weaponCount = 0;
 
 /**
  * @brief Display the main game menu
@@ -18,46 +22,11 @@ void displayGameMenu()
 {
     printf("\n=== GAME MENU ===\n");
     printf("1. Explore (z/up, s/down, q/left, d/right)\n");
-    printf("2. Fight a nearby enemy\n");
-    printf("3. Display players\n");
-    printf("4. Upgrades\n");
-    printf("5. Save\n");
-    printf("6. Return to main menu\n");
+    printf("2. Display players\n");
+    printf("3. Upgrades\n");
+    printf("4. Save\n");
+    printf("5. Return to main menu\n");
     printf("Your choice: ");
-}
-
-/**
- * @brief Display tutorial-specific game menu with limited options
- */
-void displayTutorialGameMenu(GameState *game)
-{
-    printf("\n=== GAME MENU (TUTORIAL) ===\n");
-
-    if (game->tutorialMode == 1 && game->tutorialStep == 0)
-    {
-        printf("1. Explore (discover the dungeon)\n");
-        printf("Your choice: ");
-    }
-    else if (game->tutorialMode == 1 && game->tutorialStep <= 2)
-    {
-        printf("1. Explore (open the chest C)\n");
-        printf("Your choice: ");
-    }
-    else if (game->tutorialMode == 1 && game->tutorialStep <= 4)
-    {
-        printf("1. Explore (face the enemy E)\n");
-        printf("2. Combat (when adjacent to an enemy)\n");
-        printf("Your choice: ");
-    }
-    else if (game->tutorialMode == 1 && game->tutorialStep <= 6)
-    {
-        printf("1. Explore (avoid the boss B and reach X)\n");
-        printf("Your choice: ");
-    }
-    else
-    {
-        displayGameMenu();
-    }
 }
 
 /**
@@ -271,8 +240,16 @@ void handleChestInterface(GameState *game)
         if (openChest(&game->dungeon, game->dungeon.playerPos.x, game->dungeon.playerPos.y))
         {
             printf("\n*** YOU OPENED THE CHEST! ***\n");
-            printf("You find: 50 gold coins!\n");
-            game->players[0].attack += 5;
+
+            /* Get a random weapon from the loaded weapons */
+            Weapon reward = getRandomWeapon(g_weapons, g_weaponCount);
+
+            printf("You found: %s!\n", reward.name);
+            displayWeapon(&reward);
+
+            /* Apply weapon stats to player and equip it */
+            equipWeapon(&game->players[0], &reward);
+            printf("\n%s is now equipped!\n", reward.name);
         }
         else
             printf("\nThe chest is already empty.\n");
@@ -327,37 +304,6 @@ void exploreDungeon(GameState *game)
         if (result == 3)
         {
             handleChestInterface(game);
-
-            if (game->tutorialMode == 1 && game->tutorialStep == 1)
-                runTutorial("en", &game->tutorialStep, 2);
-        }
-
-        /* Check for chest interaction */
-        int chestIdx = checkChestAt(&game->dungeon, game->dungeon.playerPos.x, game->dungeon.playerPos.y);
-        if (chestIdx >= 0 && !game->dungeon.chestOpened)
-        {
-            if (game->tutorialMode == 1 && game->tutorialStep == 0)
-                runTutorial("en", &game->tutorialStep, 1);
-        }
-
-        /* Boss dodge mechanic in tutorial */
-        if (game->tutorialMode == 1 && game->tutorialStep == 5)
-        {
-            int bx = game->dungeon.bossPos.x;
-            int by = game->dungeon.bossPos.y;
-            int px = game->dungeon.playerPos.x;
-            int py = game->dungeon.playerPos.y;
-
-            int dist = abs(bx - px) + abs(by - py);
-            if (dist == 1)
-            {
-                printf("\n!!! THE BOSS TRIES TO ATTACK YOU !!!\n");
-                printf("You dodge the attack and flee!\n");
-                runTutorial("en", &game->tutorialStep, 6);
-
-                game->dungeon.grid[by][bx] = FLOOR;
-                game->tutorialStep = 7;
-            }
         }
 
         if (result == 2) /* Exit found */
@@ -365,12 +311,6 @@ void exploreDungeon(GameState *game)
             printf("\n Congratulations! You completed the dungeon!\n");
             game->currentLevel++;
             game->progress++;
-
-            if (game->progress % 3 == 0)
-            {
-                game->difficulty++;
-                printf("Difficulty increased! Level %d\n", game->difficulty);
-            }
 
             initDungeon(&game->dungeon, game->currentLevel);
             printf("\nNew dungeon generated - Level %d\n", game->currentLevel);
@@ -387,9 +327,6 @@ void exploreDungeon(GameState *game)
                 printf("Victory! +%d experience\n", enemy.experience);
                 game->players[0].attack += 2;
                 removeEnemy(&game->dungeon, enemyIdx);
-
-                if (game->tutorialMode == 1 && game->tutorialStep == 3)
-                    runTutorial("en", &game->tutorialStep, 4);
             }
             else
             {
@@ -415,26 +352,26 @@ void playGame(GameState *game, const char *language)
 {
     srand(time(NULL));
 
-    if (game->tutorialMode == 1)
-        placeTutorialElements(&game->dungeon);
+    /* Load weapons from CSV file */
+    if (!loadWeapons(g_weapons, &g_weaponCount))
+    {
+        printf("Warning: Could not load weapons from weapon.csv\n");
+    }
+    else
+    {
+        printf("Loaded %d weapons from weapon.csv\n", g_weaponCount);
+    }
 
     printf("\n=== WELCOME TO THE GAME ===\n");
     printf("Explore the dungeon to find the exit (X)\n");
     printf("You can only see what is in your field of vision!\n");
-    printf("Walk on a chest (C) to open it!\n");
-
-    if (game->tutorialMode == 1)
-        runTutorial(language, &game->tutorialStep, 0);
+    printf("Walk on a chest (C) to get random weapons with stats!\n");
 
     int playing = 1;
     while (playing)
     {
         displayDungeon(&game->dungeon);
-
-        if (game->tutorialMode == 1 && game->tutorialStep <= 6)
-            displayTutorialGameMenu(game);
-        else
-            displayGameMenu();
+        displayGameMenu();
 
         int choice;
         scanf("%d", &choice);
@@ -445,54 +382,11 @@ void playGame(GameState *game, const char *language)
             exploreDungeon(game);
             break;
 
-        case 2: /* Fight nearby enemy */
-        {
-            if (game->tutorialMode == 1 && game->tutorialStep < 3)
-            {
-                printf("You cannot fight right now. Follow the tutorial!\n");
-                break;
-            }
-
-            int dx[4] = {0, 0, -1, 1};
-            int dy[4] = {-1, 1, 0, 0};
-            int found = 0;
-
-            for (int i = 0; i < 4 && !found; i++)
-            {
-                int nx = game->dungeon.playerPos.x + dx[i];
-                int ny = game->dungeon.playerPos.y + dy[i];
-                int enemyIdx = checkEnemyAt(&game->dungeon, nx, ny);
-
-                if (enemyIdx >= 0)
-                {
-                    found = 1;
-                    Enemy enemy = createEnemy(game->difficulty);
-                    int victory = combat(&game->players[0], &enemy);
-
-                    if (victory)
-                    {
-                        printf("Victory! +%d experience\n", enemy.experience);
-                        game->players[0].attack += 2;
-                        removeEnemy(&game->dungeon, enemyIdx);
-                    }
-                    else
-                    {
-                        printf("You have been defeated! Recovering...\n");
-                        game->players[0].health = 100;
-                    }
-                }
-            }
-
-            if (!found)
-                printf("No adjacent enemy! Use Explore to move.\n");
-            break;
-        }
-
-        case 3: /* Display players */
+        case 2: /* Display players */
             showPlayers(game);
             break;
 
-        case 4: /* Upgrades */
+        case 3: /* Upgrades */
         {
             int upgradeChoice = 1;
             while (upgradeChoice != 4)
@@ -519,11 +413,11 @@ void playGame(GameState *game, const char *language)
             break;
         }
 
-        case 5: /* Save */
-            saveGame("current_save", game->players, game->playerCount, game->progress, &game->dungeon);
+        case 4: /* Save */
+            saveGame(game->saveName, game->players, game->playerCount, game->progress, &game->dungeon);
             break;
 
-        case 6: /* Return to menu */
+        case 5: /* Return to menu */
             playing = 0;
             printf("Returning to main menu...\n");
             break;
@@ -532,8 +426,4 @@ void playGame(GameState *game, const char *language)
             printf("Invalid choice!\n");
         }
     }
-
-    /* Free memory */
-    for (int i = 0; i < game->playerCount; i++)
-        freePlayerAbilities(&game->players[i]);
 }

@@ -24,21 +24,21 @@ void gameMenu()
     char gameMode[50] = "Adventure";
     char newGame[50] = "New Game";
     char loadGame[50] = "Load Game";
-    char skipTutorial[50] = "Skip Tutorial";
-    char *difficulty[3] = {NULL, NULL, NULL};
     char *param;
 
-    printf("Select a language (en/fr): ");
-    scanf("%s", language);
-
-    if (strcmp(language, "fr") == 0)
+    do
     {
-        strcpy(menuFilePath, "lang/fr-fr/menu.txt");
-    }
-    else
-    {
-        strcpy(menuFilePath, "lang/en-gb/menu.txt");
-    }
+        printf("Select a language (en/fr): ");
+        scanf("%s", language);
+        if (strcmp(language, "fr") == 0)
+        {
+            strcpy(menuFilePath, "lang/fr-fr/menu.txt");
+        }
+        else
+        {
+            strcpy(menuFilePath, "lang/en-gb/menu.txt");
+        }
+    } while (strcmp(language, "en") != 0 && strcmp(language, "fr") != 0);
 
     param = readParam(menuFilePath, "gameName");
     if (param != NULL)
@@ -68,17 +68,6 @@ void gameMenu()
         free(param);
     }
 
-    param = readParam(menuFilePath, "skipTutorial");
-    if (param != NULL)
-    {
-        strcpy(skipTutorial, param);
-        free(param);
-    }
-
-    difficulty[0] = readParam(menuFilePath, "easyDifficulty");
-    difficulty[1] = readParam(menuFilePath, "mediumDifficulty");
-    difficulty[2] = readParam(menuFilePath, "hardDifficulty");
-
     printf("=== %s ===\n", gameName);
     printf("Mode: %s\n", gameMode);
 
@@ -92,36 +81,19 @@ void gameMenu()
     if (choice == 0)
     {
         char saveName[50];
-        int difficultyChoice = 0;
-        int skipTutorialChoice = 0;
+        int difficultyChoice = 1; // Normal mode
         int playerCount = 1;
 
         char name[50];
         printf("Enter your character's name: ");
         scanf("%s", name);
-        Player player = createPlayer(name, 100, 10, 5, "Hands", NULL, 0);
-
-        do
-        {
-            printf("Select difficulty:\n");
-            for (int i = 0; i < 3; i++)
-            {
-                printf("%d. %s\n", i, difficulty[i] ? difficulty[i] : "Difficulty");
-            }
-            scanf("%d", &difficultyChoice);
-        } while (difficultyChoice < 0 || difficultyChoice > 2);
-
-        do
-        {
-            printf("0. No %s\n", skipTutorial);
-            printf("1. Yes %s\n", skipTutorial);
-            scanf("%d", &skipTutorialChoice);
-        } while (skipTutorialChoice < 0 || skipTutorialChoice > 1);
+        Player player = createPlayer(name, 100, 10, 5, "Hands");
 
         printf("Enter a name for your save: ");
         scanf("%s", saveName);
 
-        createGame(saveName, difficultyChoice, skipTutorialChoice);
+        /* Tutorial is always skipped - pass 1 to skip tutorial */
+        createGame(saveName, difficultyChoice, 1);
         addPlayersToSave(saveName, &player, playerCount);
 
         printf("New game created for %s!\n", saveName);
@@ -129,13 +101,14 @@ void gameMenu()
         /* Load the saved game state */
         GameState game = loadGameState(saveName);
 
-        /* Set tutorial mode based on choice */
-        game.tutorialMode = (skipTutorialChoice == 0) ? 1 : 0;
+        /* Tutorial is always disabled */
+        game.tutorialMode = 0;
+
+        /* Set the save name for future saves */
+        strcpy(game.saveName, saveName);
 
         /* Run the game with the loaded state */
         playGame(&game, language);
-
-        freePlayerAbilities(&player);
     }
     else
     {
@@ -149,12 +122,9 @@ void gameMenu()
         /* Run the game without tutorial */
         game.tutorialMode = 0;
 
-        playGame(&game, language);
-    }
+        /* Set the save name for future saves */
+        strcpy(game.saveName, saveName);
 
-    /* Free memory */
-    for (int i = 0; i < 3; i++)
-    {
-        free(difficulty[i]);
+        playGame(&game, language);
     }
 }

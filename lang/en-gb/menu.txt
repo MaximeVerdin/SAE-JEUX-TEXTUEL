@@ -2,7 +2,7 @@ gameName: GAME NAME
 
 gameLanguage: EN
 
-gameMode: SOLO / COOP
+gameMode: SOLO
 
 newGame: NEW GAME
 

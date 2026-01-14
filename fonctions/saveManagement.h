@@ -24,6 +24,7 @@ typedef struct
     int tutorialStep;  /**< Current tutorial progress */
     int multiplayer;   /**< 1 if multiplayer mode */
     int skipTutorial;  /**< 1 if tutorial should be skipped */
+    char saveName[50]; /**< Name of the save file */
 } GameState;
 
 /**
