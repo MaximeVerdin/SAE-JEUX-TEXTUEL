@@ -7,10 +7,15 @@
 #include "player.h"
 #include "playGame.h"
 
+/**
+ * @brief Main game menu that handles game initialization
+ *
+ * Displays the main menu, handles new game/load game selection,
+ * difficulty selection, and launches the game loop.
+ */
 void gameMenu()
 {
     int choice = 0;
-    int multiplayer = 0;
     char language[10] = "en";
     char menuFilePath[100];
     char gameName[50] = "Game";
@@ -77,13 +82,6 @@ void gameMenu()
 
     do
     {
-        printf("0. Solo Mode\n");
-        printf("1. Coop Mode\n");
-        scanf("%d", &multiplayer);
-    } while (multiplayer < 0 || multiplayer > 1);
-
-    do
-    {
         printf("0. %s\n", newGame);
         printf("1. %s\n", loadGame);
         scanf("%d", &choice);
@@ -96,30 +94,10 @@ void gameMenu()
         int skipTutorialChoice = 0;
         int playerCount = 1;
 
-        if (multiplayer == 1)
-        {
-            printf("Enter the number of player (max 4): ");
-            scanf("%d", &playerCount);
-            if (playerCount > 4)
-                playerCount = 4;
-            if (playerCount < 1)
-                playerCount = 1;
-        }
-
-        Player *players = malloc(playerCount * sizeof(Player));
-        if (players == NULL)
-        {
-            printf("Memory allocation error!\n");
-            return;
-        }
-
-        for (int i = 0; i < playerCount; i++)
-        {
-            char name[50];
-            printf("Enter your character's name: ");
-            scanf("%s", name);
-            players[i] = createPlayer(name, 100, 10, 5, "Hands", NULL, 0);
-        }
+        char name[50];
+        printf("Enter your character's name: ");
+        scanf("%s", name);
+        Player player = createPlayer(name, 100, 10, 5, "Hands", NULL, 0);
 
         do
         {
@@ -141,25 +119,21 @@ void gameMenu()
         printf("Enter a name for your save: ");
         scanf("%s", saveName);
 
-        createGame(saveName, multiplayer, difficultyChoice, skipTutorialChoice);
-        addPlayersToSave(saveName, players, playerCount);
+        createGame(saveName, difficultyChoice, skipTutorialChoice);
+        addPlayersToSave(saveName, &player, playerCount);
 
         printf("New game created for %s!\n", saveName);
 
-        if (loadGameByName(saveName) != 0)
-        {
-            printf("Loading error!\n");
-        }
-        else
-        {
-            playGame(saveName);
-        }
+        /* Load the saved game state */
+        GameState game = loadGameState(saveName);
 
-        for (int i = 0; i < playerCount; i++)
-        {
-            freePlayerAbilities(&players[i]);
-        }
-        free(players);
+        /* Set tutorial mode based on choice */
+        game.tutorialMode = (skipTutorialChoice == 0) ? 1 : 0;
+
+        /* Run the game with the loaded state */
+        playGame(&game, language);
+
+        freePlayerAbilities(&player);
     }
     else
     {
@@ -167,17 +141,16 @@ void gameMenu()
         char saveName[50];
         scanf("%s", saveName);
 
-        if (loadGameByName(saveName) != 0)
-        {
-            printf("Loading error!\n");
-        }
-        else
-        {
-            playGame(saveName);
-        }
+        /* Load the saved game state */
+        GameState game = loadGameState(saveName);
+
+        /* Run the game without tutorial */
+        game.tutorialMode = 0;
+
+        playGame(&game, language);
     }
 
-    // Libérer la mémoire
+    /* Free memory */
     for (int i = 0; i < 3; i++)
     {
         free(difficulty[i]);

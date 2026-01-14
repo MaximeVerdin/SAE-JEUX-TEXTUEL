@@ -3,7 +3,6 @@
 
 #include "upgrade.h"
 
-// Fonctions pour l'arbre d'amélioration
 UpgradeNode *createUpgradeNode(Upgrade upgrade);
 void freeUpgradeTree(UpgradeNode *root);
 void displayUpgradeTree(UpgradeNode *root);

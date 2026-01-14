@@ -2,7 +2,11 @@
 #include <string.h>
 #include "upgrade.h"
 
-Upgrade createUpgrade(const char *name, const char *description, int cost, const char *upgradeType, int upgradeAmount)
+/**
+ * @brief Create upgrade with specified attributes
+ */
+Upgrade createUpgrade(const char *name, const char *description,
+                      int cost, const char *upgradeType, int upgradeAmount)
 {
     Upgrade upgrade;
     strncpy(upgrade.name, name, sizeof(upgrade.name) - 1);
@@ -16,6 +20,9 @@ Upgrade createUpgrade(const char *name, const char *description, int cost, const
     return upgrade;
 }
 
+/**
+ * @brief Display upgrade information
+ */
 void displayUpgrade(const Upgrade *upgrade)
 {
     printf("Upgrade Name: %s\n", upgrade->name);
