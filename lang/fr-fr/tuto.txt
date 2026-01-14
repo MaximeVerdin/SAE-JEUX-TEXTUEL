@@ -18,7 +18,7 @@ Une flèche arrive sur vous ! Aïe ! Ça doit faire mal !
 
 Sacré papy, toujours aussi farceur à ce que je vois. 
 
-Oh, mon Dieu ! Il vous a laissé l'épée divine, "L'Excaliburne", elle appartenait au brave chevalier Pilou.
+Oh, mon Dieu ! Il vous a laissé l'épée divine, "Excalibur", elle appartenait au brave chevalier Pilou.
 
 *Bruit de mécanique au loin, qui ressemble à une porte*
 $ouvre_porte_tuto$
