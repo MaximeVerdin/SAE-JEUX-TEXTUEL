@@ -2,6 +2,9 @@
 #include <stdlib.h>
 #include "upgradeTree.h"
 
+/**
+ * @brief Create upgrade tree node
+ */
 UpgradeNode *createUpgradeNode(Upgrade upgrade)
 {
     UpgradeNode *node = malloc(sizeof(UpgradeNode));
@@ -14,6 +17,9 @@ UpgradeNode *createUpgradeNode(Upgrade upgrade)
     return node;
 }
 
+/**
+ * @brief Free upgrade tree memory
+ */
 void freeUpgradeTree(UpgradeNode *root)
 {
     if (root == NULL)
@@ -23,6 +29,9 @@ void freeUpgradeTree(UpgradeNode *root)
     free(root);
 }
 
+/**
+ * @brief Display all upgrades in tree
+ */
 void displayUpgradeTree(UpgradeNode *root)
 {
     if (root == NULL)

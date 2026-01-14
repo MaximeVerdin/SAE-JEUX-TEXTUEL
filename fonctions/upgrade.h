@@ -4,6 +4,9 @@
 #include <stdio.h>
 #include <string.h>
 
+/**
+ * @brief Upgrade structure for purchasable bonuses
+ */
 typedef struct
 {
     char name[50];
@@ -13,6 +16,9 @@ typedef struct
     int upgradeAmount;
 } Upgrade;
 
+/**
+ * @brief Upgrade tree node structure
+ */
 typedef struct UpgradeNode
 {
     Upgrade upgrade;
@@ -20,8 +26,8 @@ typedef struct UpgradeNode
     struct UpgradeNode *right;
 } UpgradeNode;
 
-// Fonctions pour Upgrade
-Upgrade createUpgrade(const char *name, const char *description, int cost, const char *upgradeType, int upgradeAmount);
+Upgrade createUpgrade(const char *name, const char *description,
+                      int cost, const char *upgradeType, int upgradeAmount);
 void displayUpgrade(const Upgrade *upgrade);
 
 #endif

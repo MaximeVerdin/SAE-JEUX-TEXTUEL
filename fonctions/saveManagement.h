@@ -2,10 +2,84 @@
 #define SAVEMANAGEMENT_H
 
 #include "player.h"
+#include "dungeon.h"
 
-void createGame(char *name, int multiplayer, int difficulty, int skipTutorial);
-void addPlayersToSave(char *fileName, Player *players, int playerCount);
+/**
+ * @brief GameState structure containing all game data
+ *
+ * Stores the complete game state including all players,
+ * dungeon, progress, and tutorial state.
+ */
+typedef struct
+{
+    Player players[4]; /**< Array of players in the game */
+    int playerCount;   /**< Number of active players */
+    int progress;      /**< Current game progress */
+    int difficulty;    /**< Current difficulty level */
+    int currentLevel;  /**< Current dungeon level */
+    Dungeon dungeon;   /**< Current dungeon state */
+    int tutorialMode;  /**< 1 if tutorial is active */
+    int tutorialStep;  /**< Current tutorial progress */
+    int multiplayer;   /**< 1 if multiplayer mode */
+    int skipTutorial;  /**< 1 if tutorial should be skipped */
+} GameState;
+
+/**
+ * @brief Create a new game save file
+ *
+ * Initializes a new save file with the given game name,
+ * difficulty setting, and tutorial preference.
+ *
+ * @param name Name of the save file
+ * @param difficulty Difficulty level (0=easy, 1=medium, 2=hard)
+ * @param skipTutorial 1 to skip tutorial, 0 to play
+ */
+void createGame(char *name, int difficulty, int skipTutorial);
+
+/**
+ * @brief Add players to an existing save file
+ *
+ * Appends player data to the specified save file.
+ *
+ * @param saveName Name of the save file
+ * @param players Array of players to add
+ * @param playerCount Number of players to add
+ */
+void addPlayersToSave(char *saveName, Player *players, int playerCount);
+
+/**
+ * @brief Load and display a save file by name
+ *
+ * Reads the save file and displays its contents.
+ *
+ * @param saveName Name of the save file to load
+ * @return 0 on success, -1 if file not found
+ */
 int loadGameByName(char *saveName);
-void saveGame(char *saveName, Player *players, int playerCount, int progress);
+
+/**
+ * @brief Save the current game state
+ *
+ * Writes the current game progress and player data
+ * to the specified save file.
+ *
+ * @param saveName Name of the save file
+ * @param players Array of players
+ * @param playerCount Number of players
+ * @param progress Current progress value
+ * @param dungeon Pointer to the dungeon structure
+ */
+void saveGame(char *saveName, Player *players, int playerCount, int progress, Dungeon *dungeon);
+
+/**
+ * @brief Load a complete game state from save file
+ *
+ * Reads all game data from the save file and returns
+ * a fully initialized GameState structure.
+ *
+ * @param saveName Name of the save file to load
+ * @return GameState structure with loaded data
+ */
+GameState loadGameState(const char *saveName);
 
 #endif

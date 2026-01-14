@@ -2,7 +2,7 @@ gameName: NOM DU JEU
 
 gameLanguage: FR
 
-gameMode: SOLO / COOP
+gameMode: SOLO
 
 newGame: NOUVELLE PARTIE
 

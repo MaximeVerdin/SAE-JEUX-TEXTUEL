@@ -9,11 +9,11 @@
 int main()
 {
     printf("======================================\n");
-    printf("     JEUX TEXTUEL - ADVENTURE        \n");
+    printf("     TEXT ADVENTURE - DUNGEON        \n");
     printf("======================================\n\n");
 
     gameMenu();
 
-    printf("\nMerci d'avoir joué!\n");
+    printf("\nThank you for playing!\n");
     return 0;
 }

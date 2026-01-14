@@ -5,9 +5,89 @@
 #include "dungeon.h"
 #include "player.h"
 
+/* Tutorial dungeon layout (static 5x5 map) */
+static const char *tutorialMap[] = {
+    "#####",
+    "#@C.#",
+    "#.###",
+    "#EBX#",
+    "#####"};
+
+/**
+ * @brief Generate the tutorial dungeon layout
+ */
+void generateTutorialDungeon(Dungeon *dungeon)
+{
+    for (int i = 0; i < DUNGEON_SIZE; i++)
+    {
+        for (int j = 0; j < DUNGEON_SIZE; j++)
+        {
+            dungeon->grid[i][j] = WALL;
+            dungeon->visible[i][j] = 0;
+            dungeon->explored[i][j] = 0;
+        }
+    }
+
+    for (int i = 0; i < DUNGEON_SIZE; i++)
+    {
+        for (int j = 0; j < DUNGEON_SIZE && tutorialMap[i][j] != '\0'; j++)
+        {
+            char tile = tutorialMap[i][j];
+
+            switch (tile)
+            {
+            case '#':
+                dungeon->grid[i][j] = WALL;
+                break;
+            case '.':
+                dungeon->grid[i][j] = FLOOR;
+                break;
+            case '@':
+                dungeon->playerPos.x = j;
+                dungeon->playerPos.y = i;
+                dungeon->grid[i][j] = FLOOR;
+                break;
+            case 'C':
+                dungeon->grid[i][j] = CHEST;
+                dungeon->chests[0].x = j;
+                dungeon->chests[0].y = i;
+                dungeon->chestCount = 1;
+                dungeon->chestOpened = 0;
+                break;
+            case 'E':
+                dungeon->enemies[0].x = j;
+                dungeon->enemies[0].y = i;
+                dungeon->enemyCount = 1;
+                dungeon->grid[i][j] = FLOOR;
+                break;
+            case 'B':
+                dungeon->grid[i][j] = FLOOR;
+                dungeon->bossPos.x = j;
+                dungeon->bossPos.y = i;
+                break;
+            case 'X':
+                dungeon->exitPos.x = j;
+                dungeon->exitPos.y = i;
+                dungeon->grid[i][j] = EXIT;
+                break;
+            default:
+                dungeon->grid[i][j] = FLOOR;
+                break;
+            }
+        }
+    }
+
+    dungeon->enemyFound = 0;
+    dungeon->bossFound = 0;
+
+    updateVision(dungeon);
+}
+
+/**
+ * @brief Initialize a new dungeon for the given level
+ */
 void initDungeon(Dungeon *dungeon, int level)
 {
-    // Initialiser la grille avec des murs
     for (int i = 0; i < DUNGEON_SIZE; i++)
     {
         for (int j = 0; j < DUNGEON_SIZE; j++)
@@ -18,22 +98,27 @@ void initDungeon(Dungeon *dungeon, int level)
         }
     }
     dungeon->enemyCount = 0;
+    dungeon->chestCount = 0;
+    dungeon->chestOpened = 0;
+    dungeon->enemyFound = 0;
+    dungeon->bossFound = 0;
     generateDungeon(dungeon);
 }
 
+/**
+ * @brief Generate a procedurally created dungeon
+ */
 void generateDungeon(Dungeon *dungeon)
 {
-    // Créer des salles plus grandes et mieux connectées
-    int numRooms = 6 + rand() % 4; // 6-9 salles
+    int numRooms = 6 + rand() % 4;
 
-    // Stocker les positions des salles pour les connecter
     int roomCenters[15][2];
     int roomCount = 0;
 
     for (int r = 0; r < numRooms; r++)
     {
-        int roomW = 5 + rand() % 5; // 5-9 de large
-        int roomH = 5 + rand() % 5; // 5-9 de haut
+        int roomW = 5 + rand() % 5;
+        int roomH = 5 + rand() % 5;
         int roomX = 1 + rand() % (DUNGEON_SIZE - roomW - 2);
         int roomY = 1 + rand() % (DUNGEON_SIZE - roomH - 2);
 
@@ -45,13 +130,11 @@ void generateDungeon(Dungeon *dungeon)
             }
         }
 
-        // Stocker le centre de la salle
         roomCenters[roomCount][0] = roomX + roomW / 2;
         roomCenters[roomCount][1] = roomY + roomH / 2;
         roomCount++;
     }
 
-    // Connecter toutes les salles avec des couloirs
     for (int i = 1; i < roomCount; i++)
     {
         int x1 = roomCenters[i - 1][0];
@@ -59,56 +142,42 @@ void generateDungeon(Dungeon *dungeon)
         int x2 = roomCenters[i][0];
         int y2 = roomCenters[i][1];
 
-        // Couloir horizontal puis vertical (ou l'inverse)
         if (rand() % 2 == 0)
         {
-            // Horizontal d'abord
             int startX = (x1 < x2) ? x1 : x2;
             int endX = (x1 < x2) ? x2 : x1;
             for (int x = startX; x <= endX; x++)
             {
                 if (x > 0 && x < DUNGEON_SIZE - 1)
-                {
                     dungeon->grid[y1][x] = FLOOR;
-                }
             }
-            // Vertical ensuite
             int startY = (y1 < y2) ? y1 : y2;
             int endY = (y1 < y2) ? y2 : y1;
             for (int y = startY; y <= endY; y++)
             {
                 if (y > 0 && y < DUNGEON_SIZE - 1)
-                {
                     dungeon->grid[y][x2] = FLOOR;
-                }
             }
         }
         else
         {
-            // Vertical d'abord
             int startY = (y1 < y2) ? y1 : y2;
             int endY = (y1 < y2) ? y2 : y1;
             for (int y = startY; y <= endY; y++)
             {
                 if (y > 0 && y < DUNGEON_SIZE - 1)
-                {
                     dungeon->grid[y][x1] = FLOOR;
-                }
             }
-            // Horizontal ensuite
             int startX = (x1 < x2) ? x1 : x2;
             int endX = (x1 < x2) ? x2 : x1;
             for (int x = startX; x <= endX; x++)
             {
                 if (x > 0 && x < DUNGEON_SIZE - 1)
-                {
                     dungeon->grid[y2][x] = FLOOR;
-                }
             }
         }
     }
 
-    // Ajouter des murs à l'intérieur des salles (obstacles)
     for (int r = 0; r < numRooms; r++)
     {
         int roomW = 5 + rand() % 5;
@@ -116,14 +185,12 @@ void generateDungeon(Dungeon *dungeon)
         int roomX = 1 + rand() % (DUNGEON_SIZE - roomW - 2);
         int roomY = 1 + rand() % (DUNGEON_SIZE - roomH - 2);
 
-        // Ajouter 1-3 obstacles par salle
         int numObstacles = 1 + rand() % 3;
         for (int o = 0; o < numObstacles; o++)
         {
             int obsX = roomX + 1 + rand() % (roomW - 2);
             int obsY = roomY + 1 + rand() % (roomH - 2);
 
-            // Ne pas bloquer les entrées de salles (garder les bords)
             if (obsX > roomX && obsX < roomX + roomW - 1 &&
                 obsY > roomY && obsY < roomY + roomH - 1)
             {
@@ -132,14 +199,12 @@ void generateDungeon(Dungeon *dungeon)
         }
     }
 
-    // Ajouter quelques piliers dans les grands espaces ouverts
     for (int i = 3; i < DUNGEON_SIZE - 3; i++)
     {
         for (int j = 3; j < DUNGEON_SIZE - 3; j++)
         {
             if (dungeon->grid[i][j] == FLOOR && rand() % 15 == 0)
             {
-                // Vérifier que ça ne bloque pas complètement
                 int floorNeighbors = 0;
                 if (i > 0 && dungeon->grid[i - 1][j] == FLOOR)
                     floorNeighbors++;
@@ -151,14 +216,11 @@ void generateDungeon(Dungeon *dungeon)
                     floorNeighbors++;
 
                 if (floorNeighbors >= 3)
-                {
                     dungeon->grid[i][j] = WALL;
-                }
             }
         }
     }
 
-    // Placer le joueur
     int placed = 0;
     for (int i = 1; i < DUNGEON_SIZE - 1 && !placed; i++)
     {
@@ -173,7 +235,6 @@ void generateDungeon(Dungeon *dungeon)
         }
     }
 
-    // Placer la sortie
     int exitPlaced = 0;
     for (int i = DUNGEON_SIZE - 2; i > 0 && !exitPlaced; i--)
     {
@@ -190,34 +251,35 @@ void generateDungeon(Dungeon *dungeon)
         }
     }
 
-    // Placer des ennemis (pas à côté du joueur)
     dungeon->enemyCount = 1 + rand() % 3;
     for (int e = 0; e < dungeon->enemyCount; e++)
     {
-        int placed = 0;
-        for (int i = 1; i < DUNGEON_SIZE - 1 && !placed; i++)
+        int p = 0;
+        for (int i = 1; i < DUNGEON_SIZE - 1 && !p; i++)
         {
-            for (int j = 1; j < DUNGEON_SIZE - 1 && !placed; j++)
+            for (int j = 1; j < DUNGEON_SIZE - 1 && !p; j++)
             {
-                // Calculer la distance au joueur
-                int distToPlayer = abs(i - dungeon->playerPos.y) + abs(j - dungeon->playerPos.x);
-
+                int dist = abs(i - dungeon->playerPos.y) + abs(j - dungeon->playerPos.x);
                 if (dungeon->grid[i][j] == FLOOR &&
                     (i != dungeon->playerPos.y || j != dungeon->playerPos.x) &&
                     (i != dungeon->exitPos.y || j != dungeon->exitPos.x) &&
-                    distToPlayer >= 5) // Minimum 5 cases de distance
+                    dist >= 5)
                 {
                     dungeon->enemies[e].x = j;
                     dungeon->enemies[e].y = i;
-                    placed = 1;
+                    p = 1;
                 }
             }
         }
     }
 
+    placeRandomChests(dungeon);
     updateVision(dungeon);
 }
 
+/**
+ * @brief Check line-of-sight using Bresenham's algorithm
+ */
 int hasLineOfSight(Dungeon *dungeon, int x1, int y1, int x2, int y2)
 {
     int dx = abs(x2 - x1);
@@ -234,9 +296,7 @@ int hasLineOfSight(Dungeon *dungeon, int x1, int y1, int x2, int y2)
             return 1;
 
         if (dungeon->grid[y][x] == WALL && !(x == x1 && y == y1))
-        {
             return 0;
-        }
 
         int e2 = 2 * err;
         if (e2 > -dy)
@@ -252,19 +312,17 @@ int hasLineOfSight(Dungeon *dungeon, int x1, int y1, int x2, int y2)
     }
 }
 
+/**
+ * @brief Update fog-of-war visibility
+ */
 void updateVision(Dungeon *dungeon)
 {
     int visionRange = 3;
 
     for (int i = 0; i < DUNGEON_SIZE; i++)
-    {
         for (int j = 0; j < DUNGEON_SIZE; j++)
-        {
             dungeon->visible[i][j] = 0;
-        }
-    }
 
-    // Raycasting pour la vision
     for (int dy = -visionRange; dy <= visionRange; dy++)
     {
         for (int dx = -visionRange; dx <= visionRange; dx++)
@@ -275,31 +333,30 @@ void updateVision(Dungeon *dungeon)
                 continue;
             }
 
-            int targetX = dungeon->playerPos.x + dx;
-            int targetY = dungeon->playerPos.y + dy;
+            int tx = dungeon->playerPos.x + dx;
+            int ty = dungeon->playerPos.y + dy;
 
-            if (targetX >= 0 && targetX < DUNGEON_SIZE &&
-                targetY >= 0 && targetY < DUNGEON_SIZE)
+            if (tx >= 0 && tx < DUNGEON_SIZE && ty >= 0 && ty < DUNGEON_SIZE)
             {
                 if (hasLineOfSight(dungeon, dungeon->playerPos.x,
-                                   dungeon->playerPos.y, targetX, targetY))
+                                   dungeon->playerPos.y, tx, ty))
                 {
-                    dungeon->visible[targetY][targetX] = 1;
-                    dungeon->explored[targetY][targetX] = 1;
+                    dungeon->visible[ty][tx] = 1;
+                    dungeon->explored[ty][tx] = 1;
                 }
             }
         }
     }
 }
 
+/**
+ * @brief Display the dungeon grid
+ */
 void displayDungeon(Dungeon *dungeon)
 {
-    printf("\n");
-    printf("  ");
+    printf("\n  ");
     for (int j = 0; j < DUNGEON_SIZE; j++)
-    {
         printf("%d ", j % 10);
-    }
     printf("\n");
 
     for (int i = 0; i < DUNGEON_SIZE; i++)
@@ -309,12 +366,8 @@ void displayDungeon(Dungeon *dungeon)
         {
             if (dungeon->visible[i][j])
             {
-                // Vérifier si c'est le joueur
                 if (i == dungeon->playerPos.y && j == dungeon->playerPos.x)
-                {
                     printf("\033[1;32m%c\033[0m ", PLAYER);
-                }
-                // Vérifier si c'est un ennemi
                 else
                 {
                     int isEnemy = 0;
@@ -327,34 +380,38 @@ void displayDungeon(Dungeon *dungeon)
                             break;
                         }
                     }
-                    if (!isEnemy)
+                    if (!isEnemy && dungeon->bossFound &&
+                        dungeon->bossPos.x == j && dungeon->bossPos.y == i)
                     {
-                        printf("%c ", dungeon->grid[i][j]);
+                        printf("\033[1;35m%c\033[0m ", 'B');
+                        isEnemy = 1;
                     }
+                    if (!isEnemy)
+                        printf("%c ", dungeon->grid[i][j]);
                 }
             }
             else
-            {
-                // Case pas visible - cachée
                 printf("  ");
-            }
         }
         printf("\n");
     }
 
-    // Légende
-    printf("\n\033[1;32m@\033[0m Joueur  \033[1;31mE\033[0m Ennemi  \033[1;33mX\033[0m Sortie  # Mur\n");
+    printf("\n@ Player  E Enemy  X Exit  # Wall  C Chest\n");
 }
 
+/**
+ * @brief Check if position contains a wall
+ */
 int isWall(Dungeon *dungeon, int x, int y)
 {
     if (x < 0 || x >= DUNGEON_SIZE || y < 0 || y >= DUNGEON_SIZE)
-    {
         return 1;
-    }
     return dungeon->grid[y][x] == WALL;
 }
 
+/**
+ * @brief Move player in specified direction
+ */
 int movePlayer(Dungeon *dungeon, char direction)
 {
     int newX = dungeon->playerPos.x;
@@ -364,170 +421,152 @@ int movePlayer(Dungeon *dungeon, char direction)
     {
     case 'z':
         newY--;
-        break; // Haut
+        break;
     case 's':
         newY++;
-        break; // Bas
+        break;
     case 'q':
         newX--;
-        break; // Gauche
+        break;
     case 'd':
         newX++;
-        break; // Droite
+        break;
     default:
         return 0;
     }
 
-    // Vérifier les limites et les murs
     if (isWall(dungeon, newX, newY))
     {
-        printf("Mur! Vous ne pouvez pas passer.\n");
+        printf("Wall! You cannot pass.\n");
         return 0;
     }
 
-    // Vérifier les ennemis - collision forcée!
     int enemyIdx = checkEnemyAt(dungeon, newX, newY);
     if (enemyIdx >= 0)
     {
-        // Déplacer le joueur sur la case de l'ennemi
         dungeon->playerPos.x = newX;
         dungeon->playerPos.y = newY;
         updateVision(dungeon);
-        // Retourner l'index de l'ennemi + 10 pour éviter confusion avec autres codes
         return 10 + enemyIdx;
     }
 
-    // Vérifier la sortie
     if (dungeon->grid[newY][newX] == EXIT)
     {
-        printf("Vous avez trouvé la sortie! Niveau complété!\n");
-        return 2; // Indique la sortie
+        printf("You found the exit! Level completed!\n");
+        return 2;
     }
 
-    // Déplacer le joueur
+    int chestIdx = checkChestAt(dungeon, newX, newY);
+    if (chestIdx >= 0 && !dungeon->chestOpened)
+    {
+        dungeon->playerPos.x = newX;
+        dungeon->playerPos.y = newY;
+        updateVision(dungeon);
+        return 3;
+    }
+
     dungeon->playerPos.x = newX;
     dungeon->playerPos.y = newY;
-
     updateVision(dungeon);
     return 1;
 }
 
+/**
+ * @brief Check if enemy exists at position
+ */
 int checkEnemyAt(Dungeon *dungeon, int x, int y)
 {
     for (int e = 0; e < dungeon->enemyCount; e++)
-    {
         if (dungeon->enemies[e].x == x && dungeon->enemies[e].y == y)
-        {
             return e;
-        }
-    }
     return -1;
 }
 
+/**
+ * @brief Remove enemy from dungeon
+ */
 void removeEnemy(Dungeon *dungeon, int index)
 {
-    // Stocker la position de l'ennemi à supprimer
     int oldX = dungeon->enemies[index].x;
     int oldY = dungeon->enemies[index].y;
 
-    // Déplacer les ennemis suivants
     for (int e = index; e < dungeon->enemyCount - 1; e++)
-    {
         dungeon->enemies[e] = dungeon->enemies[e + 1];
-    }
     dungeon->enemyCount--;
 
-    // Effacer l'ennemi de la grille (remplacer par du sol)
     if (oldX >= 0 && oldX < DUNGEON_SIZE && oldY >= 0 && oldY < DUNGEON_SIZE)
-    {
         dungeon->grid[oldY][oldX] = FLOOR;
-    }
 }
 
+/**
+ * @brief Check if position is valid for movement
+ */
 int canMoveTo(Dungeon *dungeon, int x, int y)
 {
     if (isWall(dungeon, x, y))
         return 0;
-    // Ne peut pas aller sur la sortie
     if (dungeon->grid[y][x] == EXIT)
         return 0;
-    // Ne peut pas aller sur un autre ennemi (mais peut aller sur le joueur pour combat)
     for (int e = 0; e < dungeon->enemyCount; e++)
-    {
         if (dungeon->enemies[e].x == x && dungeon->enemies[e].y == y)
             return 0;
-    }
     return 1;
 }
 
+/**
+ * @brief Check if player is adjacent to enemy
+ */
 int isPlayerAdjacent(Dungeon *dungeon, int enemyIdx)
 {
-    int ex = dungeon->enemies[enemyIdx].x;
-    int ey = dungeon->enemies[enemyIdx].y;
-    int px = dungeon->playerPos.x;
-    int py = dungeon->playerPos.y;
-
+    int ex = dungeon->enemies[enemyIdx].x, ey = dungeon->enemies[enemyIdx].y;
+    int px = dungeon->playerPos.x, py = dungeon->playerPos.y;
     return (abs(ex - px) <= 1 && abs(ey - py) <= 1);
 }
 
+/**
+ * @brief Check if enemy can see player
+ */
 int canSeePlayer(Dungeon *dungeon, int enemyIdx)
 {
-    int ex = dungeon->enemies[enemyIdx].x;
-    int ey = dungeon->enemies[enemyIdx].y;
-    int px = dungeon->playerPos.x;
-    int py = dungeon->playerPos.y;
-
-    // Vérifier si le joueur est visible par l'ennemi
-    int dx = abs(ex - px);
-    int dy = abs(ey - py);
-
+    int ex = dungeon->enemies[enemyIdx].x, ey = dungeon->enemies[enemyIdx].y;
+    int px = dungeon->playerPos.x, py = dungeon->playerPos.y;
+    int dx = abs(ex - px), dy = abs(ey - py);
     if (dx > 4 || dy > 4)
         return 0;
-
     return hasLineOfSight(dungeon, ex, ey, px, py);
 }
 
-// Retourne l'index de l'ennemi qui a attaqué, ou -1 si aucun
+/**
+ * @brief Move enemy toward player
+ */
 int moveEnemyTowardPlayer(Dungeon *dungeon, int enemyIdx)
 {
-    int ex = dungeon->enemies[enemyIdx].x;
-    int ey = dungeon->enemies[enemyIdx].y;
-    int px = dungeon->playerPos.x;
-    int py = dungeon->playerPos.y;
+    int ex = dungeon->enemies[enemyIdx].x, ey = dungeon->enemies[enemyIdx].y;
+    int px = dungeon->playerPos.x, py = dungeon->playerPos.y;
 
-    // Vérifier si l'ennemi est déjà sur le joueur (combat!)
     if (ex == px && ey == py)
-    {
         return enemyIdx;
-    }
 
     int moveX = 0, moveY = 0;
-
     if (px < ex)
         moveX = -1;
     else if (px > ex)
         moveX = 1;
-
     if (py < ey)
         moveY = -1;
     else if (py > ey)
         moveY = 1;
 
-    // Essayer d'abord la direction directe vers le joueur
-    int nx = ex + moveX;
-    int ny = ey + moveY;
+    int nx = ex + moveX, ny = ey + moveY;
 
-    // Si le joueur est là, combat!
     if (nx == px && ny == py)
     {
-        // Déplacer l'ennemi sur le joueur
         dungeon->grid[ey][ex] = FLOOR;
         dungeon->enemies[enemyIdx].x = nx;
         dungeon->enemies[enemyIdx].y = ny;
-        return enemyIdx; // Combat!
+        return enemyIdx;
     }
 
-    // Sinon essayer de se déplacer normalement
     if (canMoveTo(dungeon, nx, ny))
     {
         dungeon->grid[ey][ex] = FLOOR;
@@ -536,24 +575,18 @@ int moveEnemyTowardPlayer(Dungeon *dungeon, int enemyIdx)
     }
     else
     {
-        // Essayer les autres directions
-        int directions[8][2] = {
-            {moveX, moveY}, {moveX, 0}, {0, moveY}, {-moveX, moveY}, {moveX, -moveY}, {-moveX, 0}, {0, -moveY}, {0, 0}};
-
+        int dirs[8][2] = {{moveX, moveY}, {moveX, 0}, {0, moveY}, {-moveX, moveY}, {moveX, -moveY}, {-moveX, 0}, {0, -moveY}, {0, 0}};
         for (int d = 0; d < 7; d++)
         {
-            nx = ex + directions[d][0];
-            ny = ey + directions[d][1];
-
+            nx = ex + dirs[d][0];
+            ny = ey + dirs[d][1];
             if (nx == px && ny == py)
             {
-                // Attaquer le joueur!
                 dungeon->grid[ey][ex] = FLOOR;
                 dungeon->enemies[enemyIdx].x = nx;
                 dungeon->enemies[enemyIdx].y = ny;
                 return enemyIdx;
             }
-
             if (canMoveTo(dungeon, nx, ny))
             {
                 dungeon->grid[ey][ex] = FLOOR;
@@ -563,10 +596,12 @@ int moveEnemyTowardPlayer(Dungeon *dungeon, int enemyIdx)
             }
         }
     }
-
     return -1;
 }
 
+/**
+ * @brief Update all enemy positions
+ */
 void updateEnemies(Dungeon *dungeon)
 {
     for (int e = 0; e < dungeon->enemyCount; e++)
@@ -575,10 +610,111 @@ void updateEnemies(Dungeon *dungeon)
         {
             int result = moveEnemyTowardPlayer(dungeon, e);
             if (result >= 0)
+                printf("\n!!! AN ENEMY IS ATTACKING YOU !!!\n");
+        }
+    }
+}
+
+/**
+ * @brief Check if chest exists at position
+ */
+int checkChestAt(Dungeon *dungeon, int x, int y)
+{
+    for (int c = 0; c < dungeon->chestCount; c++)
+        if (dungeon->chests[c].x == x && dungeon->chests[c].y == y)
+            return c;
+    return -1;
+}
+
+/**
+ * @brief Open chest at position
+ */
+int openChest(Dungeon *dungeon, int x, int y)
+{
+    int idx = checkChestAt(dungeon, x, y);
+    if (idx >= 0)
+    {
+        dungeon->grid[y][x] = FLOOR;
+        dungeon->chestOpened = 1;
+        return 1;
+    }
+    return 0;
+}
+
+/**
+ * @brief Place random treasure chests
+ */
+void placeRandomChests(Dungeon *dungeon)
+{
+    dungeon->chestCount = 0;
+    dungeon->chestOpened = 0;
+
+    if (rand() % 5 == 0)
+        return;
+
+    int numChests = 1 + rand() % 3;
+
+    for (int c = 0; c < numChests && dungeon->chestCount < 5; c++)
+    {
+        int p = 0, attempts = 0;
+        while (!p && attempts < 100)
+        {
+            int x = 1 + rand() % (DUNGEON_SIZE - 2);
+            int y = 1 + rand() % (DUNGEON_SIZE - 2);
+
+            if (dungeon->grid[y][x] == FLOOR &&
+                (x != dungeon->playerPos.x || y != dungeon->playerPos.y) &&
+                (x != dungeon->exitPos.x || y != dungeon->exitPos.y) &&
+                checkEnemyAt(dungeon, x, y) < 0 &&
+                checkChestAt(dungeon, x, y) < 0)
             {
-                // Un ennemi a attaqué - le combat sera géré par le jeu
-                printf("\n!!! UN ENNEMI VOUS ATTAQUE !!!\n");
+                dungeon->grid[y][x] = CHEST;
+                dungeon->chests[dungeon->chestCount].x = x;
+                dungeon->chests[dungeon->chestCount].y = y;
+                dungeon->chestCount++;
+                p = 1;
+            }
+            attempts++;
+        }
+    }
+}
+
+/**
+ * @brief Place tutorial elements
+ */
+void placeTutorialElements(Dungeon *dungeon)
+{
+    int p = 0;
+    for (int i = 1; i < DUNGEON_SIZE - 1 && !p; i++)
+    {
+        for (int j = 1; j < DUNGEON_SIZE - 1 && !p; j++)
+        {
+            if (dungeon->grid[i][j] == FLOOR)
+            {
+                int dist = abs(i - dungeon->playerPos.y) + abs(j - dungeon->playerPos.x);
+                if (dist >= 3 && dist <= 8)
+                {
+                    dungeon->grid[i][j] = CHEST;
+                    dungeon->chests[0].x = j;
+                    dungeon->chests[0].y = i;
+                    dungeon->chestCount = 1;
+                    p = 1;
+                }
             }
         }
     }
+}
+
+/**
+ * @brief Create enemy with difficulty scaling
+ */
+Enemy createEnemy(int difficulty)
+{
+    Enemy enemy;
+    const char *names[] = {"Goblin", "Orc", "Skeleton", "Troll", "Dragon"};
+    strcpy(enemy.name, names[rand() % 5]);
+    enemy.health = 20 + (difficulty * 10) + (rand() % 20);
+    enemy.attack = 5 + (difficulty * 3) + (rand() % 8);
+    enemy.experience = 10 + (difficulty * 5);
+    return enemy;
 }
