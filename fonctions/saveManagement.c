@@ -23,8 +23,11 @@ void createGame(char *name, int difficulty, int skipTutorial)
     }
     fprintf(file, "Name:%s\n", name);
     fprintf(file, "Difficulty:%d\n", difficulty);
-    fprintf(file, "Progress:%d\n", 0);
     fprintf(file, "SkipTutorial:%d\n", skipTutorial);
+    /* Initialize boss tracking for new game - boss spawns after 5 rooms */
+    fprintf(file, "BossActive:0\n");
+    fprintf(file, "RoomsSinceLastBoss:0\n");
+    fprintf(file, "CurrentLevel:1\n");
     fprintf(file, "!\n");
     fprintf(file, "player;name;health;maxHealth;attack;luck;weapon\n");
     fclose(file);
@@ -88,9 +91,10 @@ int loadGameByName(char *saveName)
 }
 
 /**
- * @brief Save the current game state
+ * @brief Save the current game state with level progress
  */
-void saveGame(char *saveName, Player *players, int playerCount, int progress, Dungeon *dungeon)
+void saveGame(char *saveName, Player *players, int playerCount, Dungeon *dungeon,
+              int currentLevel, int bossActive, int roomsSinceLastBoss, int difficulty, int multiplayer)
 {
     char fileName[100];
     snprintf(fileName, sizeof(fileName), "saves/%s_save.csv", saveName);
@@ -103,7 +107,14 @@ void saveGame(char *saveName, Player *players, int playerCount, int progress, Du
     }
 
     fprintf(file, "Name:%s\n", saveName);
-    fprintf(file, "Progress:%d\n", progress);
+
+    /* Save game state - level progress and difficulty */
+    fprintf(file, "CurrentLevel:%d\n", currentLevel);
+    fprintf(file, "BossActive:%d\n", bossActive);
+    fprintf(file, "RoomsSinceLastBoss:%d\n", roomsSinceLastBoss);
+    fprintf(file, "Difficulty:%d\n", difficulty);
+    fprintf(file, "Multiplayer:%d\n", multiplayer);
+    fprintf(file, "SkipTutorial:1\n");
 
     /* Save dungeon state - player position (room number) */
     fprintf(file, "RoomX:%d\n", dungeon->playerPos.x);
@@ -165,17 +176,20 @@ GameState loadGameState(const char *saveName)
     /* Initialize with defaults */
     memset(&game, 0, sizeof(GameState));
     game.playerCount = 1;
-    game.progress = 0;
     game.difficulty = 1;
     game.currentLevel = 1;
     game.tutorialMode = 0;
     game.tutorialStep = 0;
+    game.bossActive = 0;
+    game.roomsSinceLastBoss = 0;
+    game.multiplayer = 0;
+    game.skipTutorial = 1;
 
     /* Create default player */
     Player defaultPlayer = createPlayer("Hero", 100, 10, 5, "Hands");
     game.players[0] = defaultPlayer;
 
-    /* Initialize dungeon */
+    /* Initialize dungeon - will be overwritten if save has dungeon data */
     initDungeon(&game.dungeon, 1);
 
     char fileName[100];
@@ -192,6 +206,7 @@ GameState loadGameState(const char *saveName)
     int inPlayerSection = 0;
     int inGridSection = 0;
     int gridRow = 0;
+    int hasGridData = 0;
 
     printf("Loading game '%s'...\n", saveName);
 
@@ -224,6 +239,7 @@ GameState loadGameState(const char *saveName)
                 /* Only process if it doesn't contain key:value patterns or section markers */
                 if (strchr(buffer, ':') == NULL && strchr(buffer, ';') == NULL)
                 {
+                    hasGridData = 1;
                     for (int j = 0; j < DUNGEON_SIZE && j < (int)strlen(buffer); j++)
                     {
                         game.dungeon.grid[gridRow][j] = buffer[j];
@@ -239,15 +255,30 @@ GameState loadGameState(const char *saveName)
         {
             printf("Save name: %s\n", buffer + 5);
         }
-        else if (strncmp(buffer, "Progress:", 9) == 0)
+        else if (strncmp(buffer, "CurrentLevel:", 13) == 0)
         {
-            game.progress = atoi(buffer + 9);
-            printf("Progress: %d\n", game.progress);
+            game.currentLevel = atoi(buffer + 13);
+            printf("Current Level: %d\n", game.currentLevel);
+        }
+        else if (strncmp(buffer, "BossActive:", 11) == 0)
+        {
+            game.bossActive = atoi(buffer + 11);
+            printf("Boss Active: %d\n", game.bossActive);
+        }
+        else if (strncmp(buffer, "RoomsSinceLastBoss:", 19) == 0)
+        {
+            game.roomsSinceLastBoss = atoi(buffer + 19);
+            printf("Rooms Since Last Boss: %d\n", game.roomsSinceLastBoss);
         }
         else if (strncmp(buffer, "Difficulty:", 11) == 0)
         {
             game.difficulty = atoi(buffer + 11);
             printf("Difficulty: %d\n", game.difficulty);
+        }
+        else if (strncmp(buffer, "Multiplayer:", 12) == 0)
+        {
+            game.multiplayer = atoi(buffer + 12);
+            printf("Multiplayer: %d\n", game.multiplayer);
         }
         else if (strncmp(buffer, "SkipTutorial:", 13) == 0)
         {
@@ -378,6 +409,54 @@ GameState loadGameState(const char *saveName)
     }
 
     fclose(file);
+
+    /* If we have dungeon grid data, we need to reinitialize with the saved level */
+    if (hasGridData)
+    {
+        /* Reinitialize dungeon with the saved current level */
+        initDungeon(&game.dungeon, game.currentLevel);
+
+        /* Re-apply the saved grid data */
+        rewind(file);
+        inGridSection = 0;
+        gridRow = 0;
+        file = fopen(fileName, "r");
+
+        while (fgets(buffer, sizeof(buffer), file))
+        {
+            buffer[strcspn(buffer, "\n")] = 0;
+
+            if (strcmp(buffer, "Grid:") == 0)
+            {
+                inGridSection = 1;
+                gridRow = 0;
+                continue;
+            }
+
+            if (inGridSection)
+            {
+                if (strcmp(buffer, "!") == 0)
+                {
+                    inGridSection = 0;
+                    continue;
+                }
+
+                if (gridRow < DUNGEON_SIZE && strlen(buffer) >= DUNGEON_SIZE)
+                {
+                    if (strchr(buffer, ':') == NULL && strchr(buffer, ';') == NULL)
+                    {
+                        for (int j = 0; j < DUNGEON_SIZE && j < (int)strlen(buffer); j++)
+                        {
+                            game.dungeon.grid[gridRow][j] = buffer[j];
+                        }
+                        gridRow++;
+                    }
+                }
+            }
+        }
+        fclose(file);
+    }
+
     printf("Game loaded successfully!\n");
 
     /* Update vision based on loaded player position */

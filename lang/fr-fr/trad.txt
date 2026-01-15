@@ -209,3 +209,11 @@ roomHealed: Piece complétée! Vous heal pour %d HP.
 # Combat invalid choice
 combatInvalidChoice: Choix invalide! Veuillez entrer 1 pour Attaquer ou 2 pour Bloquer.
 
+# Boss encounters
+bossWarning: !!! BOSS APPROCHE! !!!
+bossEncounter: !!! RENCONTRE AVEC LE BOSS: %s !!!
+bossInfo: %s - Santé: %d, Attaque: %d
+bossDefeated: LE BOSS %s A ÉTÉ VAINCU!
+bossVictory: Victoire épique! +%d expérience
+bossNotDefeated: Vous devez d'abord vaincre le BOSS pour accéder à la sortie!
+

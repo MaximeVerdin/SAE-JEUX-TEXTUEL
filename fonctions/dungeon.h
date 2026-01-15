@@ -278,4 +278,39 @@ void placeRandomChests(Dungeon *dungeon);
  */
 Enemy createEnemy(int difficulty);
 
+/**
+ * @brief Create a boss enemy with enhanced stats
+ *
+ * Generates a powerful boss enemy with significantly higher
+ * health, attack, and experience than regular enemies.
+ * Boss difficulty scales with the current level.
+ *
+ * @param level Current dungeon level
+ * @return Initialized Enemy structure with boss stats
+ */
+Enemy createBoss(int level);
+
+/**
+ * @brief Spawn a boss at the exit position
+ *
+ * Places a boss at the exit of the dungeon to block progress.
+ * The boss replaces the exit marker until defeated.
+ *
+ * @param dungeon Pointer to the current dungeon
+ * @param level Current dungeon level for difficulty scaling
+ */
+void spawnBossAtExit(Dungeon *dungeon, int level);
+
+/**
+ * @brief Check if a boss exists at the specified position
+ *
+ * Searches for a boss at the given coordinates.
+ *
+ * @param dungeon Pointer to the current dungeon
+ * @param x X coordinate to check
+ * @param y Y coordinate to check
+ * @return 1 if boss found at position, 0 otherwise
+ */
+int checkBossAt(Dungeon *dungeon, int x, int y);
+
 #endif

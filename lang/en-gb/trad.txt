@@ -209,3 +209,11 @@ roomHealed: Room completed! You heal for %d HP.
 # Combat invalid choice
 combatInvalidChoice: Invalid choice! Please enter 1 to Attack or 2 to Block.
 
+# Boss encounters
+bossWarning: !!! BOSS APPROACHING !!!
+bossEncounter: !!! BOSS ENCOUNTER: %s !!!
+bossInfo: %s - Health: %d, Attack: %d
+bossDefeated: BOSS %s HAS BEEN DEFEATED!
+bossVictory: Epic victory! +%d experience
+bossNotDefeated: You must defeat the BOSS first to access the exit!
+

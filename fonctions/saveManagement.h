@@ -1,5 +1,7 @@
 /* Author names : VERDIN Maxime and FOURNIER Nathan */
 
+/* Author names : VERDIN Maxime and FOURNIER Nathan */
+
 #ifndef SAVEMANAGEMENT_H
 #define SAVEMANAGEMENT_H
 
@@ -14,17 +16,18 @@
  */
 typedef struct
 {
-    Player players[4]; /**< Array of players in the game */
-    int playerCount;   /**< Number of active players */
-    int progress;      /**< Current game progress */
-    int difficulty;    /**< Current difficulty level */
-    int currentLevel;  /**< Current dungeon level */
-    Dungeon dungeon;   /**< Current dungeon state */
-    int tutorialMode;  /**< 1 if tutorial is active */
-    int tutorialStep;  /**< Current tutorial progress */
-    int multiplayer;   /**< 1 if multiplayer mode */
-    int skipTutorial;  /**< 1 if tutorial should be skipped */
-    char saveName[50]; /**< Name of the save file */
+    Player players[4];      /**< Array of players in the game */
+    int playerCount;        /**< Number of active players */
+    int difficulty;         /**< Current difficulty level */
+    int currentLevel;       /**< Current dungeon level */
+    Dungeon dungeon;        /**< Current dungeon state */
+    int tutorialMode;       /**< 1 if tutorial is active */
+    int tutorialStep;       /**< Current tutorial progress */
+    int multiplayer;        /**< 1 if multiplayer mode */
+    int skipTutorial;       /**< 1 if tutorial should be skipped */
+    char saveName[50];      /**< Name of the save file */
+    int bossActive;         /**< 1 if boss is currently spawned */
+    int roomsSinceLastBoss; /**< Counter for rooms completed since last boss */
 } GameState;
 
 /**
@@ -61,24 +64,31 @@ void addPlayersToSave(char *saveName, Player *players, int playerCount);
 int loadGameByName(char *saveName);
 
 /**
- * @brief Save the current game state
+ * @brief Save the current game state with level progress
  *
- * Writes the current game progress and player data
- * to the specified save file.
+ * Writes the current game progress, level state, and player data
+ * to the specified save file. This version saves the complete
+ * game state including current level, boss status, and difficulty.
  *
  * @param saveName Name of the save file
  * @param players Array of players
  * @param playerCount Number of players
- * @param progress Current progress value
  * @param dungeon Pointer to the dungeon structure
+ * @param currentLevel Current dungeon level
+ * @param bossActive 1 if boss is currently active
+ * @param roomsSinceLastBoss Rooms completed since last boss
+ * @param difficulty Current difficulty level
+ * @param multiplayer 1 if multiplayer mode
  */
-void saveGame(char *saveName, Player *players, int playerCount, int progress, Dungeon *dungeon);
+void saveGame(char *saveName, Player *players, int playerCount, Dungeon *dungeon,
+              int currentLevel, int bossActive, int roomsSinceLastBoss, int difficulty, int multiplayer);
 
 /**
  * @brief Load a complete game state from save file
  *
  * Reads all game data from the save file and returns
- * a fully initialized GameState structure.
+ * a fully initialized GameState structure. This includes
+ * level progress, boss status, and all player data.
  *
  * @param saveName Name of the save file to load
  * @return GameState structure with loaded data
@@ -86,3 +96,6 @@ void saveGame(char *saveName, Player *players, int playerCount, int progress, Du
 GameState loadGameState(const char *saveName);
 
 #endif
+
+/* Author names : VERDIN Maxime and FOURNIER Nathan */
+

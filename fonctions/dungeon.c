@@ -26,6 +26,8 @@ void initDungeon(Dungeon *dungeon, int level)
     dungeon->chestOpened = 0;
     dungeon->enemyFound = 0;
     dungeon->bossFound = 0;
+    dungeon->bossPos.x = -1;
+    dungeon->bossPos.y = -1;
     generateDungeon(dungeon);
 }
 
@@ -201,7 +203,33 @@ void generateDungeon(Dungeon *dungeon)
     }
 
     placeRandomChests(dungeon);
+
+    /* Boss position is initialized in initDungeon() */
+    /* Boss will be spawned by spawnBossAtExit() when appropriate */
+
     updateVision(dungeon);
+}
+
+/**
+ * @brief Spawn a boss at the exit position
+ *
+ * Places a boss at the exit of the dungeon to block progress.
+ * The boss replaces the exit marker until defeated.
+ *
+ * @param dungeon Pointer to the current dungeon
+ * @param level Current dungeon level for difficulty scaling
+ */
+void spawnBossAtExit(Dungeon *dungeon, int level)
+{
+    /* Place boss at exit position */
+    dungeon->bossPos.x = dungeon->exitPos.x;
+    dungeon->bossPos.y = dungeon->exitPos.y;
+    dungeon->bossFound = 1;
+
+    printf("\n");
+    printf("!!! UN BOSS GARDE LA SORTIE! !!!\n");
+    printf("Vous devez vaincre %s pour progresser!\n", createBoss(level).name);
+    printf("\n");
 }
 
 /**
@@ -293,8 +321,22 @@ void displayDungeon(Dungeon *dungeon)
         {
             if (dungeon->visible[i][j])
             {
-                if (i == dungeon->playerPos.y && j == dungeon->playerPos.x)
+                /* Check if player and boss are on the same tile - show B@ */
+                if (i == dungeon->playerPos.y && j == dungeon->playerPos.x &&
+                    dungeon->bossFound && dungeon->bossPos.x == j && dungeon->bossPos.y == i)
+                {
+                    printf("\033[1;35mB\033[0m\033[1;32m@\033[0m ");
+                }
+                /* Check if player is on this tile */
+                else if (i == dungeon->playerPos.y && j == dungeon->playerPos.x)
                     printf("\033[1;32m%c\033[0m ", PLAYER);
+                /* Check if boss is on this tile */
+                else if (dungeon->bossFound &&
+                         dungeon->bossPos.x == j && dungeon->bossPos.y == i)
+                {
+                    printf("\033[1;35m%c\033[0m ", 'B');
+                }
+                /* Check for regular enemies */
                 else
                 {
                     int isEnemy = 0;
@@ -306,12 +348,6 @@ void displayDungeon(Dungeon *dungeon)
                             isEnemy = 1;
                             break;
                         }
-                    }
-                    if (!isEnemy && dungeon->bossFound &&
-                        dungeon->bossPos.x == j && dungeon->bossPos.y == i)
-                    {
-                        printf("\033[1;35m%c\033[0m ", 'B');
-                        isEnemy = 1;
                     }
                     if (!isEnemy)
                     {
@@ -333,7 +369,7 @@ void displayDungeon(Dungeon *dungeon)
         printf("\n");
     }
 
-    printf("\n\033[1;32m@\033[0m Player  \033[1;31mE\033[0m Enemy  \033[1;36mX\033[0m Exit  # Wall  \033[1;33mC\033[0m Chest\n");
+    printf("\n\033[1;32m@\033[0m Player  \033[1;35mB\033[0m Boss  \033[1;31mE\033[0m Enemy  \033[1;36mX\033[0m Exit  # Wall  \033[1;33mC\033[0m Chest\n");
 }
 
 /**
@@ -376,6 +412,15 @@ int movePlayer(Dungeon *dungeon, char direction)
     {
         printf("Wall! You cannot pass.\n");
         return 0;
+    }
+
+    /* Check if moving onto boss position - return 4 for boss encounter */
+    if (dungeon->bossFound && dungeon->bossPos.x == newX && dungeon->bossPos.y == newY)
+    {
+        dungeon->playerPos.x = newX;
+        dungeon->playerPos.y = newY;
+        updateVision(dungeon);
+        return 4; /* Boss encounter code */
     }
 
     int enemyIdx = checkEnemyAt(dungeon, newX, newY);
@@ -667,4 +712,47 @@ Enemy createEnemy(int difficulty)
     enemy.attack = 5 + (difficulty * 3) + (rand() % 8);
     enemy.experience = 10 + (difficulty * 5);
     return enemy;
+}
+
+/**
+ * @brief Create a powerful boss enemy with enhanced stats
+ *
+ * Boss enemies have significantly higher stats than regular enemies
+ * and scale with the current dungeon level. Boss names are more
+ * menacing and include titles.
+ *
+ * @param level Current dungeon level
+ * @return Initialized Enemy structure with boss stats
+ */
+Enemy createBoss(int level)
+{
+    Enemy enemy;
+    const char *bossNames[] = {
+        "Goblin King", "Orc Warlord", "Lich Lord",
+        "Troll Chieftain", "Ancient Dragon", "Demon Lord",
+        "Dark Knight", "Shadow Mage", "Beast Master", "Warrior Prime"};
+    strcpy(enemy.name, bossNames[rand() % 10]);
+
+    /* Boss stats scale with level - significantly stronger than regular enemies */
+    enemy.health = 80 + (level * 25) + (rand() % 30);
+    enemy.attack = 12 + (level * 4) + (rand() % 10);
+    enemy.experience = 50 + (level * 15);
+
+    return enemy;
+}
+
+/**
+ * @brief Check if a boss exists at the specified position
+ *
+ * @param dungeon Pointer to the current dungeon
+ * @param x X coordinate to check
+ * @param y Y coordinate to check
+ * @return 1 if boss found at position, 0 otherwise
+ */
+int checkBossAt(Dungeon *dungeon, int x, int y)
+{
+    if (dungeon->bossFound &&
+        dungeon->bossPos.x == x && dungeon->bossPos.y == y)
+        return 1;
+    return 0;
 }
