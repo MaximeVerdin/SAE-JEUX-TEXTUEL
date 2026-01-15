@@ -22,7 +22,7 @@ void initDungeon(Dungeon *dungeon, int level)
         }
     }
     dungeon->enemyCount = 0;
-    dungeon->chestCount = 0;
+    dungeon->hasChest = 0;
     dungeon->chestOpened = 0;
     dungeon->enemyFound = 0;
     dungeon->bossFound = 0;
@@ -380,13 +380,19 @@ int movePlayer(Dungeon *dungeon, char direction)
         return 2;
     }
 
-    int chestIdx = checkChestAt(dungeon, newX, newY);
-    if (chestIdx >= 0 && !dungeon->chestOpened)
+    int chestFound = checkChestAt(dungeon, newX, newY);
+    if (chestFound && !dungeon->chestOpened)
     {
         dungeon->playerPos.x = newX;
         dungeon->playerPos.y = newY;
         updateVision(dungeon);
         return 3;
+    }
+
+    /* Reset chestOpened flag if player is not on a chest */
+    if (!checkChestAt(dungeon, dungeon->playerPos.x, dungeon->playerPos.y))
+    {
+        dungeon->chestOpened = 0;
     }
 
     dungeon->playerPos.x = newX;
@@ -544,10 +550,9 @@ void updateEnemies(Dungeon *dungeon)
  */
 int checkChestAt(Dungeon *dungeon, int x, int y)
 {
-    for (int c = 0; c < dungeon->chestCount; c++)
-        if (dungeon->chests[c].x == x && dungeon->chests[c].y == y)
-            return c;
-    return -1;
+    if (dungeon->hasChest && dungeon->chest.x == x && dungeon->chest.y == y)
+        return 1;
+    return 0;
 }
 
 /**
@@ -555,10 +560,10 @@ int checkChestAt(Dungeon *dungeon, int x, int y)
  */
 int openChest(Dungeon *dungeon, int x, int y)
 {
-    int idx = checkChestAt(dungeon, x, y);
-    if (idx >= 0)
+    if (checkChestAt(dungeon, x, y))
     {
         dungeon->grid[y][x] = FLOOR;
+        dungeon->hasChest = 0;
         dungeon->chestOpened = 1;
         return 1;
     }
@@ -566,40 +571,36 @@ int openChest(Dungeon *dungeon, int x, int y)
 }
 
 /**
- * @brief Place random treasure chests
+ * @brief Place a random treasure chest
  */
 void placeRandomChests(Dungeon *dungeon)
 {
-    dungeon->chestCount = 0;
+    dungeon->hasChest = 0;
     dungeon->chestOpened = 0;
 
+    /* 20% chance no chest in dungeon */
     if (rand() % 5 == 0)
         return;
 
-    int numChests = 1 + rand() % 3;
-
-    for (int c = 0; c < numChests && dungeon->chestCount < 5; c++)
+    /* Place at most one chest */
+    int p = 0, attempts = 0;
+    while (!p && attempts < 100)
     {
-        int p = 0, attempts = 0;
-        while (!p && attempts < 100)
-        {
-            int x = 1 + rand() % (DUNGEON_SIZE - 2);
-            int y = 1 + rand() % (DUNGEON_SIZE - 2);
+        int x = 1 + rand() % (DUNGEON_SIZE - 2);
+        int y = 1 + rand() % (DUNGEON_SIZE - 2);
 
-            if (dungeon->grid[y][x] == FLOOR &&
-                (x != dungeon->playerPos.x || y != dungeon->playerPos.y) &&
-                (x != dungeon->exitPos.x || y != dungeon->exitPos.y) &&
-                checkEnemyAt(dungeon, x, y) < 0 &&
-                checkChestAt(dungeon, x, y) < 0)
-            {
-                dungeon->grid[y][x] = CHEST;
-                dungeon->chests[dungeon->chestCount].x = x;
-                dungeon->chests[dungeon->chestCount].y = y;
-                dungeon->chestCount++;
-                p = 1;
-            }
-            attempts++;
+        if (dungeon->grid[y][x] == FLOOR &&
+            (x != dungeon->playerPos.x || y != dungeon->playerPos.y) &&
+            (x != dungeon->exitPos.x || y != dungeon->exitPos.y) &&
+            checkEnemyAt(dungeon, x, y) < 0)
+        {
+            dungeon->grid[y][x] = CHEST;
+            dungeon->chest.x = x;
+            dungeon->chest.y = y;
+            dungeon->hasChest = 1;
+            p = 1;
         }
+        attempts++;
     }
 }
 

@@ -20,13 +20,29 @@ static int g_weaponCount = 0;
  */
 void displayGameMenu()
 {
-    printf("\n=== GAME MENU ===\n");
-    printf("1. Explore (z/up, s/down, q/left, d/right)\n");
-    printf("2. Display players\n");
-    printf("3. Upgrades\n");
-    printf("4. Save\n");
-    printf("5. Return to main menu\n");
-    printf("Your choice: ");
+    char *gameMenuTitle = getTranslatedText("gameMenuTitle");
+    char *exploreOption = getTranslatedText("exploreOption");
+    char *displayPlayersOption = getTranslatedText("displayPlayersOption");
+    char *upgradesOption = getTranslatedText("upgradesOption");
+    char *saveOption = getTranslatedText("saveOption");
+    char *returnMenuOption = getTranslatedText("returnMenuOption");
+    char *yourChoice = getTranslatedText("yourChoice");
+
+    printf("\n=== %s ===\n", gameMenuTitle);
+    printf("1. %s\n", exploreOption);
+    printf("2. %s\n", displayPlayersOption);
+    printf("3. %s\n", upgradesOption);
+    printf("4. %s\n", saveOption);
+    printf("5. %s\n", returnMenuOption);
+    printf("%s ", yourChoice);
+
+    free(gameMenuTitle);
+    free(exploreOption);
+    free(displayPlayersOption);
+    free(upgradesOption);
+    free(saveOption);
+    free(returnMenuOption);
+    free(yourChoice);
 }
 
 /**
@@ -34,10 +50,20 @@ void displayGameMenu()
  */
 void displayDungeonMenu()
 {
-    printf("\n=== DUNGEON - Level %d ===\n", 1);
-    printf("Use z/s/q/d to move\n");
-    printf("1. Return to menu\n");
-    printf("Your choice: ");
+    char *dungeonTitle = getTranslatedText("dungeonTitle");
+    char *dungeonDirections = getTranslatedText("dungeonDirections");
+    char *returnToMenu = getTranslatedText("returnToMenu");
+    char *yourChoice = getTranslatedText("yourChoice");
+
+    printf("\n=== %s ===\n", dungeonTitle);
+    printf("%s\n", dungeonDirections);
+    printf("1. %s\n", returnToMenu);
+    printf("%s ", yourChoice);
+
+    free(dungeonTitle);
+    free(dungeonDirections);
+    free(returnToMenu);
+    free(yourChoice);
 }
 
 /**
@@ -45,10 +71,20 @@ void displayDungeonMenu()
  */
 void displayCombatMenu()
 {
-    printf("\n=== COMBAT ACTIONS ===\n");
-    printf("1. Fight - Attack the enemy\n");
-    printf("2. Block - Reduce incoming damage by 50%% (parry chance based on luck)\n");
-    printf("Your choice: ");
+    char *combatTitle = getTranslatedText("combatTitle");
+    char *fightOption = getTranslatedText("fightOption");
+    char *blockOption = getTranslatedText("blockOption");
+    char *combatYourChoice = getTranslatedText("combatYourChoice");
+
+    printf("\n=== %s ===\n", combatTitle);
+    printf("1. %s\n", fightOption);
+    printf("2. %s\n", blockOption);
+    printf("%s ", combatYourChoice);
+
+    free(combatTitle);
+    free(fightOption);
+    free(blockOption);
+    free(combatYourChoice);
 }
 
 /**
@@ -56,9 +92,34 @@ void displayCombatMenu()
  */
 int combat(Player *player, Enemy *enemy)
 {
-    printf("\n=== COMBAT: %s vs %s ===\n", player->name, enemy->name);
-    printf("%s - Health: %d, Attack: %d\n", enemy->name, enemy->health, enemy->attack);
-    printf("Your Luck: %d (higher luck = better critical hits and parries)\n", player->luck);
+    char *combatStart = getTranslatedText("combatStart");
+    char *enemyInfo = getTranslatedText("enemyInfo");
+    char *yourLuck = getTranslatedText("yourLuck");
+
+    char *criticalHit = getTranslatedText("criticalHit");
+    char *criticalHitText = getTranslatedText("criticalHitText");
+    char *attackText = getTranslatedText("attackText");
+    char *dealsDamage = getTranslatedText("dealsDamage");
+    char *defeated = getTranslatedText("defeated");
+
+    char *parryTitle = getTranslatedText("parryTitle");
+    char *parryText = getTranslatedText("parryText");
+    char *noDamageTaken = getTranslatedText("noDamageTaken");
+    char *counterAttack = getTranslatedText("counterAttack");
+    char *parryDefeated = getTranslatedText("parryDefeated");
+
+    char *blockingStance = getTranslatedText("blockingStance");
+    char *damageReduced = getTranslatedText("damageReduced");
+    char *enemyAttacks = getTranslatedText("enemyAttacks");
+    char *playerDefeated = getTranslatedText("playerDefeated");
+
+    printf("\n");
+    printf(combatStart, player->name, enemy->name);
+    printf("\n");
+    printf(enemyInfo, enemy->name, enemy->health, enemy->attack);
+    printf("\n");
+    printf(yourLuck, player->luck);
+    printf("\n");
 
     int blocking = 0; /* Track if player is blocking this turn */
     int parried = 0;  /* Track if player successfully parried */
@@ -90,20 +151,41 @@ int combat(Player *player, Enemy *enemy)
             {
                 /* Critical hit! Double damage */
                 playerDamage = playerDamage * 2;
-                printf("\n*** CRITICAL HIT! ***\n");
-                printf("%s strikes with deadly precision! ", player->name);
+                printf("\n%s\n", criticalHit);
+                printf(criticalHitText, player->name);
             }
             else
             {
-                printf("\n%s attacks! ", player->name);
+                printf("\n");
+                printf(attackText, player->name);
             }
+            printf(" ");
+            printf(dealsDamage, playerDamage);
+            printf("\n");
 
             enemy->health -= playerDamage;
-            printf("Deals %d damage!\n", playerDamage);
 
             if (enemy->health <= 0)
             {
-                printf("%s has been defeated!\n", enemy->name);
+                printf(defeated, enemy->name);
+                printf("\n");
+                free(combatStart);
+                free(enemyInfo);
+                free(yourLuck);
+                free(criticalHit);
+                free(criticalHitText);
+                free(attackText);
+                free(dealsDamage);
+                free(defeated);
+                free(parryTitle);
+                free(parryText);
+                free(noDamageTaken);
+                free(counterAttack);
+                free(parryDefeated);
+                free(blockingStance);
+                free(damageReduced);
+                free(enemyAttacks);
+                free(playerDefeated);
                 return 1;
             }
         }
@@ -120,37 +202,82 @@ int combat(Player *player, Enemy *enemy)
             {
                 /* Successful parry! */
                 parried = 1;
-                printf("\n*** PARRY! ***\n");
-                printf("%s perfectly blocks the attack and counters!\n", player->name);
-                printf("No damage taken and you strike back!\n");
+                printf("\n%s\n", parryTitle);
+                printf("%s\n", noDamageTaken);
 
                 /* Counter-attack on parry */
                 int counterDamage = player->attack + (rand() % player->luck);
+                printf(counterAttack, counterDamage);
+                printf("\n");
+
                 enemy->health -= counterDamage;
-                printf("Counter-attack deals %d damage!\n", counterDamage);
 
                 if (enemy->health <= 0)
                 {
-                    printf("%s has been defeated by the parry counter!\n", enemy->name);
+                    printf(parryDefeated, enemy->name);
+                    printf("\n");
+                    free(combatStart);
+                    free(enemyInfo);
+                    free(yourLuck);
+                    free(criticalHit);
+                    free(criticalHitText);
+                    free(attackText);
+                    free(dealsDamage);
+                    free(defeated);
+                    free(parryTitle);
+                    free(parryText);
+                    free(noDamageTaken);
+                    free(counterAttack);
+                    free(parryDefeated);
+                    free(blockingStance);
+                    free(damageReduced);
+                    free(enemyAttacks);
+                    free(playerDefeated);
                     return 1;
                 }
             }
             else
             {
-                printf("\n%s takes a defensive stance! Incoming damage will be reduced.\n", player->name);
+                printf("\n");
+                printf(blockingStance, player->name);
+                printf("\n");
             }
         }
         else
         {
             /* Invalid choice - treat as fight */
-            printf("\nInvalid choice! %s attacks instead!\n", player->name);
+            char *invalidChoiceFight = getTranslatedText("invalidChoiceFight");
+            printf("\n");
+            printf(invalidChoiceFight, player->name);
+            printf("\n");
+            free(invalidChoiceFight);
+
             int playerDamage = player->attack + (rand() % player->luck);
             enemy->health -= playerDamage;
-            printf("%s deals %d damage!\n", player->name, playerDamage);
+            printf(dealsDamage, playerDamage);
+            printf("\n");
 
             if (enemy->health <= 0)
             {
-                printf("%s has been defeated!\n", enemy->name);
+                printf(defeated, enemy->name);
+                printf("\n");
+                free(combatStart);
+                free(enemyInfo);
+                free(yourLuck);
+                free(criticalHit);
+                free(criticalHitText);
+                free(attackText);
+                free(dealsDamage);
+                free(defeated);
+                free(parryTitle);
+                free(parryText);
+                free(noDamageTaken);
+                free(counterAttack);
+                free(parryDefeated);
+                free(blockingStance);
+                free(damageReduced);
+                free(enemyAttacks);
+                free(playerDefeated);
                 return 1;
             }
         }
@@ -170,24 +297,60 @@ int combat(Player *player, Enemy *enemy)
             {
                 /* Standard block reduces damage by 50% */
                 finalEnemyDamage = baseEnemyDamage / 2;
-                printf("%s attacks! You blocked! Damage reduced from %d to %d.\n",
-                       enemy->name, baseEnemyDamage, finalEnemyDamage);
+                printf(damageReduced, enemy->name, baseEnemyDamage, finalEnemyDamage);
+                printf("\n");
             }
         }
         else
         {
-            printf("%s attacks! Deals %d damage!\n", enemy->name, baseEnemyDamage);
+            printf(enemyAttacks, enemy->name, baseEnemyDamage);
+            printf("\n");
         }
 
         damagePlayer(player, finalEnemyDamage);
 
         if (player->health <= 0)
         {
-            printf("%s has been defeated...\n", player->name);
+            printf(playerDefeated, player->name);
+            printf("\n");
+            free(combatStart);
+            free(enemyInfo);
+            free(yourLuck);
+            free(criticalHit);
+            free(criticalHitText);
+            free(attackText);
+            free(dealsDamage);
+            free(defeated);
+            free(parryTitle);
+            free(parryText);
+            free(noDamageTaken);
+            free(counterAttack);
+            free(parryDefeated);
+            free(blockingStance);
+            free(damageReduced);
+            free(enemyAttacks);
+            free(playerDefeated);
             return 0;
         }
     }
 
+    free(combatStart);
+    free(enemyInfo);
+    free(yourLuck);
+    free(criticalHit);
+    free(criticalHitText);
+    free(attackText);
+    free(dealsDamage);
+    free(defeated);
+    free(parryTitle);
+    free(parryText);
+    free(noDamageTaken);
+    free(counterAttack);
+    free(parryDefeated);
+    free(blockingStance);
+    free(damageReduced);
+    free(enemyAttacks);
+    free(playerDefeated);
     return 0;
 }
 
@@ -196,12 +359,26 @@ int combat(Player *player, Enemy *enemy)
  */
 void displayUpgradesMenu()
 {
-    printf("\n=== UPGRADES ===\n");
-    printf("1. +5 Attack (100 coins)\n");
-    printf("2. +10 Health (100 coins)\n");
-    printf("3. +2 Luck (150 coins)\n");
-    printf("4. Return\n");
-    printf("Your choice: ");
+    char *upgradesTitle = getTranslatedText("upgradesTitle");
+    char *attackUpgrade = getTranslatedText("attackUpgrade");
+    char *healthUpgrade = getTranslatedText("healthUpgrade");
+    char *luckUpgrade = getTranslatedText("luckUpgrade");
+    char *returnOption = getTranslatedText("returnOption");
+    char *upgradeChoice = getTranslatedText("upgradeChoice");
+
+    printf("\n=== %s ===\n", upgradesTitle);
+    printf("1. %s\n", attackUpgrade);
+    printf("2. %s\n", healthUpgrade);
+    printf("3. %s\n", luckUpgrade);
+    printf("4. %s\n", returnOption);
+    printf("%s ", upgradeChoice);
+
+    free(upgradesTitle);
+    free(attackUpgrade);
+    free(healthUpgrade);
+    free(luckUpgrade);
+    free(returnOption);
+    free(upgradeChoice);
 }
 
 /**
@@ -209,27 +386,45 @@ void displayUpgradesMenu()
  */
 void showPlayers(GameState *game)
 {
-    printf("\n=== PLAYERS (%d/%d) ===\n", game->playerCount, game->playerCount);
+    char *playersTitle = getTranslatedText("playersTitle");
+    char *playerNumber = getTranslatedText("playerNumber");
+
+    printf("\n");
+    printf(playersTitle, game->playerCount, game->playerCount);
+    printf("\n");
     for (int i = 0; i < game->playerCount; i++)
     {
-        printf("\nPlayer %d:\n", i + 1);
+        printf(playerNumber, i + 1);
+        printf("\n");
         displayPlayer(&game->players[i]);
     }
+
+    free(playersTitle);
+    free(playerNumber);
 }
 
-/**
- * @brief Handle chest interaction interface
- */
 void handleChestInterface(GameState *game)
 {
+    char *chestFound = getTranslatedText("chestFound");
+    char *chestDescription = getTranslatedText("chestDescription");
+    char *chestQuestion = getTranslatedText("chestQuestion");
+    char *openChestText = getTranslatedText("openChest");
+    char *leaveChest = getTranslatedText("leaveChest");
+    char *yourChoice = getTranslatedText("yourChoice");
+    char *chestOpened = getTranslatedText("chestOpened");
+    char *chestReward = getTranslatedText("chestReward");
+    char *chestEmpty = getTranslatedText("chestEmpty");
+    char *chestLeave = getTranslatedText("chestLeave");
+    char *chestInvalid = getTranslatedText("chestInvalid");
+
     printf("\n======================================\n");
-    printf("  CHEST FOUND!\n");
+    printf("  %s\n", chestFound);
     printf("======================================\n");
-    printf("You found a mysterious chest.\n");
-    printf("What would you like to do?\n\n");
-    printf("1. Open the chest\n");
-    printf("2. Leave it and move on\n");
-    printf("\nYour choice: ");
+    printf("%s\n", chestDescription);
+    printf("%s\n\n", chestQuestion);
+    printf("1. %s\n", openChestText);
+    printf("2. %s\n", leaveChest);
+    printf("\n%s ", yourChoice);
 
     int choice;
     scanf("%d", &choice);
@@ -239,44 +434,69 @@ void handleChestInterface(GameState *game)
     case 1:
         if (openChest(&game->dungeon, game->dungeon.playerPos.x, game->dungeon.playerPos.y))
         {
-            printf("\n*** YOU OPENED THE CHEST! ***\n");
+            printf("\n*** %s ***\n", chestOpened);
 
             /* Get a random weapon from the loaded weapons */
             Weapon reward = getRandomWeapon(g_weapons, g_weaponCount);
 
-            printf("You found: %s!\n", reward.name);
-            displayWeapon(&reward);
+            char *rewardName = getWeaponTranslatedName(reward.name);
+            printf(chestReward, rewardName);
+            printf("\n");
+            free(rewardName);
 
-            /* Apply weapon stats to player and equip it */
-            equipWeapon(&game->players[0], &reward);
-            printf("\n%s is now equipped!\n", reward.name);
+            /* Show weapon comparison interface - allows player to equip or decline */
+            if (weaponComparisonInterface(&game->players[0], &reward, g_weapons, g_weaponCount))
+            {
+                equipWeapon(&game->players[0], &reward, g_weapons, g_weaponCount);
+            }
         }
         else
-            printf("\nThe chest is already empty.\n");
+            printf("\n%s\n", chestEmpty);
         break;
     case 2:
-        printf("\nYou decide to leave the chest for later.\n");
+        printf("\n%s\n", chestLeave);
+        game->dungeon.chestOpened = 0; /* Reset so chest can be opened later */
         game->dungeon.playerPos.y--;
         break;
     default:
-        printf("\nInvalid choice. You leave the chest.\n");
+        printf("\n%s\n", chestInvalid);
+        game->dungeon.chestOpened = 0; /* Reset so chest can be opened later */
         game->dungeon.playerPos.y--;
         break;
     }
+
+    free(chestFound);
+    free(chestDescription);
+    free(chestQuestion);
+    free(openChestText);
+    free(leaveChest);
+    free(yourChoice);
+    free(chestOpened);
+    free(chestReward);
+    free(chestEmpty);
+    free(chestLeave);
+    free(chestInvalid);
 }
 
-/**
- * @brief Main dungeon exploration loop
- */
 void exploreDungeon(GameState *game)
 {
+    char *explorePrompt = getTranslatedText("explorePrompt");
+    char *exploreInvalid = getTranslatedText("exploreInvalid");
+    char *congratulations = getTranslatedText("congratulations");
+    char *newDungeon = getTranslatedText("newDungeon");
+    char *encounterEnemy = getTranslatedText("encounterEnemy");
+    char *victoryExp = getTranslatedText("victoryExp");
+    char *playerDefeatedRecover = getTranslatedText("playerDefeatedRecover");
+    char *wallBlocked = getTranslatedText("wallBlocked");
+    char *exitFound = getTranslatedText("exitFound");
+
     displayDungeon(&game->dungeon);
 
     int exploring = 1;
     while (exploring)
     {
         char move;
-        printf("\nDirection (z/up, s/down, q/left, d/right) or 1/return: ");
+        printf("\n%s", explorePrompt);
         fflush(stdout);
 
         /* Read the first character - if it's a newline, read the actual input */
@@ -294,7 +514,7 @@ void exploreDungeon(GameState *game)
 
         if (move != 'z' && move != 's' && move != 'q' && move != 'd')
         {
-            printf("Invalid direction! Use z/s/q/d\n");
+            printf("%s\n", exploreInvalid);
             continue;
         }
 
@@ -308,29 +528,38 @@ void exploreDungeon(GameState *game)
 
         if (result == 2) /* Exit found */
         {
-            printf("\n Congratulations! You completed the dungeon!\n");
+            printf("\n %s\n", congratulations);
+            /* Heal the player for 50% of current health when completing a room */
+            int healAmount = game->players[0].health / 2;
+            if (healAmount > 0)
+            {
+                healPlayer(&game->players[0], healAmount);
+            }
             game->currentLevel++;
             game->progress++;
 
             initDungeon(&game->dungeon, game->currentLevel);
-            printf("\nNew dungeon generated - Level %d\n", game->currentLevel);
+            printf("\n");
+            printf(newDungeon, game->currentLevel);
+            printf("\n");
         }
         else if (result >= 10) /* Enemy encounter - forced collision! */
         {
             int enemyIdx = result - 10;
-            printf("\n!!! ENCOUNTER WITH AN ENEMY !!!\n");
+            printf("\n%s\n", encounterEnemy);
             Enemy enemy = createEnemy(game->difficulty);
             int victory = combat(&game->players[0], &enemy);
 
             if (victory)
             {
-                printf("Victory! +%d experience\n", enemy.experience);
+                printf(victoryExp, enemy.experience);
+                printf("\n");
                 game->players[0].attack += 2;
                 removeEnemy(&game->dungeon, enemyIdx);
             }
             else
             {
-                printf("You have been defeated! Recovering...\n");
+                printf("%s\n", playerDefeatedRecover);
                 game->players[0].health = 100;
             }
         }
@@ -343,6 +572,16 @@ void exploreDungeon(GameState *game)
         if (exploring)
             displayDungeon(&game->dungeon);
     }
+
+    free(explorePrompt);
+    free(exploreInvalid);
+    free(congratulations);
+    free(newDungeon);
+    free(encounterEnemy);
+    free(victoryExp);
+    free(playerDefeatedRecover);
+    free(wallBlocked);
+    free(exitFound);
 }
 
 /**
@@ -353,19 +592,36 @@ void playGame(GameState *game, const char *language)
     srand(time(NULL));
 
     /* Load weapons from CSV file */
+    char *weaponsLoaded = getTranslatedText("weaponsLoaded");
+    char *weaponsWarning = getTranslatedText("weaponsWarning");
+
     if (!loadWeapons(g_weapons, &g_weaponCount))
     {
-        printf("Warning: Could not load weapons from weapon.csv\n");
+        printf("%s\n", weaponsWarning);
     }
     else
     {
-        printf("Loaded %d weapons from weapon.csv\n", g_weaponCount);
+        printf(weaponsLoaded, g_weaponCount);
+        printf("\n");
     }
 
-    printf("\n=== WELCOME TO THE GAME ===\n");
-    printf("Explore the dungeon to find the exit (X)\n");
-    printf("You can only see what is in your field of vision!\n");
-    printf("Walk on a chest (C) to get random weapons with stats!\n");
+    free(weaponsLoaded);
+    free(weaponsWarning);
+
+    char *welcomeTitle = getTranslatedText("welcomeTitle");
+    char *exploreInstructions = getTranslatedText("exploreInstructions");
+    char *visionInstructions = getTranslatedText("visionInstructions");
+    char *chestInstructions = getTranslatedText("chestInstructions");
+
+    printf("\n=== %s ===\n", welcomeTitle);
+    printf("%s\n", exploreInstructions);
+    printf("%s\n", visionInstructions);
+    printf("%s\n", chestInstructions);
+
+    free(welcomeTitle);
+    free(exploreInstructions);
+    free(visionInstructions);
+    free(chestInstructions);
 
     int playing = 1;
     while (playing)
@@ -388,6 +644,10 @@ void playGame(GameState *game, const char *language)
 
         case 3: /* Upgrades */
         {
+            char *attackIncreased = getTranslatedText("attackIncreased");
+            char *healthRestored = getTranslatedText("healthRestored");
+            char *luckIncreased = getTranslatedText("luckIncreased");
+
             int upgradeChoice = 1;
             while (upgradeChoice != 4)
             {
@@ -398,18 +658,21 @@ void playGame(GameState *game, const char *language)
                 {
                 case 1:
                     addAttack(&game->players[0], 5);
-                    printf("Attack increased!\n");
+                    printf("%s\n", attackIncreased);
                     break;
                 case 2:
                     healPlayer(&game->players[0], 10);
-                    printf("Health restored!\n");
+                    printf("%s\n", healthRestored);
                     break;
                 case 3:
                     addLuck(&game->players[0], 2);
-                    printf("Luck increased!\n");
+                    printf("%s\n", luckIncreased);
                     break;
                 }
             }
+            free(attackIncreased);
+            free(healthRestored);
+            free(luckIncreased);
             break;
         }
 
@@ -419,11 +682,17 @@ void playGame(GameState *game, const char *language)
 
         case 5: /* Return to menu */
             playing = 0;
-            printf("Returning to main menu...\n");
+            char *returningMenu = getTranslatedText("returningMenu");
+            printf("%s\n", returningMenu);
+            free(returningMenu);
             break;
 
         default:
-            printf("Invalid choice!\n");
+            char *invalidChoice = getTranslatedText("invalidChoice");
+            printf("%s\n", invalidChoice);
+            free(invalidChoice);
         }
     }
 }
+
+/* Author names : VERDIN Maxime and FOURNIER Nathan */

@@ -20,52 +20,70 @@ void gameMenu()
     int choice = 0;
     char language[10] = "en";
     char menuFilePath[100];
-    char gameName[50] = "Game";
-    char gameMode[50] = "Adventure";
-    char newGame[50] = "New Game";
-    char loadGame[50] = "Load Game";
     char *param;
+
+    /* Get translated strings using the translation system */
+    char *gameName = getTranslatedText("gameName");
+    char *gameMode = getTranslatedText("gameMode");
+    char *newGame = getTranslatedText("newGame");
+    char *loadGame = getTranslatedText("loadGame");
+    char *selectLanguage = getTranslatedText("selectLanguage");
 
     do
     {
-        printf("Select a language (en/fr): ");
+        printf("%s", selectLanguage);
         scanf("%s", language);
         if (strcmp(language, "fr") == 0)
         {
             strcpy(menuFilePath, "lang/fr-fr/menu.txt");
+            setLanguage("fr-fr");
         }
         else
         {
             strcpy(menuFilePath, "lang/en-gb/menu.txt");
+            setLanguage("en-gb");
         }
     } while (strcmp(language, "en") != 0 && strcmp(language, "fr") != 0);
 
+    /* Re-get translated strings after language change */
+    free(gameName);
+    free(gameMode);
+    free(newGame);
+    free(loadGame);
+    free(selectLanguage);
+
+    gameName = getTranslatedText("gameName");
+    gameMode = getTranslatedText("gameMode");
+    newGame = getTranslatedText("newGame");
+    loadGame = getTranslatedText("loadGame");
+
+    /* Override with trad.txt values if they exist */
     param = readParam(menuFilePath, "gameName");
     if (param != NULL)
     {
-        strcpy(gameName, param);
-        free(param);
+        free(gameName);
+        gameName = param;
     }
 
     param = readParam(menuFilePath, "gameMode");
     if (param != NULL)
     {
-        strcpy(gameMode, param);
-        free(param);
+        free(gameMode);
+        gameMode = param;
     }
 
     param = readParam(menuFilePath, "newGame");
     if (param != NULL)
     {
-        strcpy(newGame, param);
-        free(param);
+        free(newGame);
+        newGame = param;
     }
 
     param = readParam(menuFilePath, "loadGame");
     if (param != NULL)
     {
-        strcpy(loadGame, param);
-        free(param);
+        free(loadGame);
+        loadGame = param;
     }
 
     printf("=== %s ===\n", gameName);
@@ -81,22 +99,29 @@ void gameMenu()
     if (choice == 0)
     {
         char saveName[50];
-        int difficultyChoice = 1; // Normal mode
+        int difficultyChoice = 1; /* Normal mode */
         int playerCount = 1;
 
         char name[50];
-        printf("Enter your character's name: ");
+        char *enterName = getTranslatedText("enterCharacterName");
+        printf("%s", enterName);
+        free(enterName);
         scanf("%s", name);
         Player player = createPlayer(name, 100, 10, 5, "Hands");
 
-        printf("Enter a name for your save: ");
+        char *enterSave = getTranslatedText("enterSaveName");
+        printf("%s", enterSave);
+        free(enterSave);
         scanf("%s", saveName);
 
         /* Tutorial is always skipped - pass 1 to skip tutorial */
         createGame(saveName, difficultyChoice, 1);
         addPlayersToSave(saveName, &player, playerCount);
 
-        printf("New game created for %s!\n", saveName);
+        char *newGameCreated = getTranslatedText("newGameCreated");
+        printf(newGameCreated, saveName);
+        printf("\n");
+        free(newGameCreated);
 
         /* Load the saved game state */
         GameState game = loadGameState(saveName);
@@ -109,10 +134,18 @@ void gameMenu()
 
         /* Run the game with the loaded state */
         playGame(&game, language);
+
+        /* Free translated strings */
+        free(gameName);
+        free(gameMode);
+        free(newGame);
+        free(loadGame);
     }
     else
     {
-        printf("Enter the name of your saved game: ");
+        char *loadSave = getTranslatedText("loadSave");
+        printf("%s\n", loadSave);
+        free(loadSave);
         char saveName[50];
         scanf("%s", saveName);
 
@@ -126,5 +159,11 @@ void gameMenu()
         strcpy(game.saveName, saveName);
 
         playGame(&game, language);
+
+        /* Free translated strings */
+        free(gameName);
+        free(gameMode);
+        free(newGame);
+        free(loadGame);
     }
 }

@@ -126,12 +126,12 @@ void saveGame(char *saveName, Player *players, int playerCount, int progress, Du
         fprintf(file, "Enemy:%d;%d;%d\n", e, dungeon->enemies[e].x, dungeon->enemies[e].y);
     }
 
-    /* Save chest positions and state */
-    fprintf(file, "ChestCount:%d\n", dungeon->chestCount);
+    /* Save chest state */
+    fprintf(file, "HasChest:%d\n", dungeon->hasChest);
     fprintf(file, "ChestOpened:%d\n", dungeon->chestOpened);
-    for (int c = 0; c < dungeon->chestCount; c++)
+    if (dungeon->hasChest)
     {
-        fprintf(file, "Chest:%d;%d;%d\n", c, dungeon->chests[c].x, dungeon->chests[c].y);
+        fprintf(file, "Chest:%d;%d\n", dungeon->chest.x, dungeon->chest.y);
     }
 
     fprintf(file, "!\n");
@@ -216,18 +216,19 @@ GameState loadGameState(const char *saveName)
                 continue;
             }
 
-            /* Check if this is a regular line (not a key:value or section marker) */
-            if (strchr(buffer, ':') == NULL &&
-                strchr(buffer, ';') == NULL &&
-                gridRow < DUNGEON_SIZE &&
-                strlen(buffer) >= DUNGEON_SIZE)
+            /* Check if this is a regular grid row (length >= DUNGEON_SIZE) */
+            if (gridRow < DUNGEON_SIZE && strlen(buffer) >= DUNGEON_SIZE)
             {
-                for (int j = 0; j < DUNGEON_SIZE && j < (int)strlen(buffer); j++)
+                /* Only process if it doesn't contain key:value patterns or section markers */
+                if (strchr(buffer, ':') == NULL && strchr(buffer, ';') == NULL)
                 {
-                    game.dungeon.grid[gridRow][j] = buffer[j];
+                    for (int j = 0; j < DUNGEON_SIZE && j < (int)strlen(buffer); j++)
+                    {
+                        game.dungeon.grid[gridRow][j] = buffer[j];
+                    }
+                    gridRow++;
+                    continue;
                 }
-                gridRow++;
-                continue;
             }
         }
 
@@ -282,9 +283,9 @@ GameState loadGameState(const char *saveName)
                 }
             }
         }
-        else if (strncmp(buffer, "ChestCount:", 11) == 0)
+        else if (strncmp(buffer, "HasChest:", 9) == 0)
         {
-            game.dungeon.chestCount = atoi(buffer + 11);
+            game.dungeon.hasChest = atoi(buffer + 9);
         }
         else if (strncmp(buffer, "ChestOpened:", 12) == 0)
         {
@@ -292,19 +293,14 @@ GameState loadGameState(const char *saveName)
         }
         else if (strncmp(buffer, "Chest:", 6) == 0)
         {
-            /* Format: Chest:index;x;y */
+            /* Format: Chest:x;y */
             char *token = strtok(buffer + 6, ";");
             if (token)
             {
-                int idx = atoi(token);
+                game.dungeon.chest.x = atoi(token);
                 token = strtok(NULL, ";");
                 if (token)
-                {
-                    game.dungeon.chests[idx].x = atoi(token);
-                    token = strtok(NULL, ";");
-                    if (token && idx >= 0 && idx < 5)
-                        game.dungeon.chests[idx].y = atoi(token);
-                }
+                    game.dungeon.chest.y = atoi(token);
             }
         }
         else if (strcmp(buffer, "!") == 0 && !inGridSection)
@@ -376,5 +372,10 @@ GameState loadGameState(const char *saveName)
     fclose(file);
     printf("Game loaded successfully!\n");
 
+    /* Update vision based on loaded player position */
+    updateVision(&game.dungeon);
+
     return game;
 }
+
+/* Author names : VERDIN Maxime and FOURNIER Nathan */

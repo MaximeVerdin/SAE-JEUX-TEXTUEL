@@ -66,13 +66,51 @@ void displayWeapon(const Weapon *weapon);
 void applyWeaponStats(Player *player, const Weapon *weapon);
 
 /**
+ * @brief Remove weapon stats from player
+ *
+ * Subtracts the currently equipped weapon's stats from the player
+ * and resets the weapon to "Fists" (default weapon with 0 stats).
+ *
+ * @param player Pointer to the player
+ * @param weapons Array of available weapons to find the current weapon stats
+ * @param weaponCount Number of weapons in the array
+ */
+void unequipWeapon(Player *player, const Weapon weapons[], int weaponCount);
+
+/**
  * @brief Change player's weapon and apply stats
  *
- * Updates the player's equipped weapon and applies stat bonuses.
+ * First removes the current weapon's stats, then applies the new weapon's stats.
  *
  * @param player Pointer to the player
  * @param weapon Pointer to the new weapon
+ * @param weapons Array of available weapons
+ * @param weaponCount Number of weapons in the array
  */
-void equipWeapon(Player *player, const Weapon *weapon);
+void equipWeapon(Player *player, const Weapon *weapon, const Weapon weapons[], int weaponCount);
+
+/**
+ * @brief Display side-by-side comparison of current and new weapon
+ *
+ * Shows both weapons' stats with highlighting of differences.
+ *
+ * @param currentWeapon Pointer to the currently equipped weapon
+ * @param newWeapon Pointer to the new weapon being considered
+ */
+void compareWeapons(const Weapon *currentWeapon, const Weapon *newWeapon);
+
+/**
+ * @brief Interactive interface for weapon comparison and equip decision
+ *
+ * Shows comparison between current equipped weapon and new weapon,
+ * allows player to choose to equip or decline the new weapon.
+ *
+ * @param player Pointer to the player
+ * @param newWeapon Pointer to the new weapon being offered
+ * @param weapons Array of all loaded weapons (to find current weapon stats)
+ * @param weaponCount Number of weapons in the array
+ * @return 1 if weapon was equipped, 0 if declined
+ */
+int weaponComparisonInterface(Player *player, const Weapon *newWeapon, Weapon weapons[], int weaponCount);
 
 #endif

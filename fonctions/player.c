@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "player.h"
+#include "utils.h"
 
 /**
  * @brief Apply damage to a player
@@ -87,11 +88,25 @@ void changeWeapon(Player *player, const char *newWeapon)
  */
 void displayPlayer(const Player *player)
 {
-    printf("Player Name: %s\n", player->name);
-    printf("Health: %d\n", player->health);
-    printf("Attack: %d\n", player->attack);
-    printf("Luck: %d\n", player->luck);
-    printf("Weapon: %s\n", player->weapon);
+    char *translatedPlayerName = getTranslatedText("playerName");
+    char *translatedHealth = getTranslatedText("statHealth");
+    char *translatedAttack = getTranslatedText("statAttack");
+    char *translatedLuck = getTranslatedText("statLuck");
+    char *translatedWeapon = getTranslatedText("statWeapon");
+    char *translatedWeaponName = getWeaponTranslatedName(player->weapon);
+
+    printf("%s: %s\n", translatedPlayerName, player->name);
+    printf("%s: %d\n", translatedHealth, player->health);
+    printf("%s: %d\n", translatedAttack, player->attack);
+    printf("%s: %d\n", translatedLuck, player->luck);
+    printf("%s: %s\n", translatedWeapon, translatedWeaponName);
+
+    free(translatedPlayerName);
+    free(translatedHealth);
+    free(translatedAttack);
+    free(translatedLuck);
+    free(translatedWeapon);
+    free(translatedWeaponName);
 }
 
 /**

@@ -56,9 +56,9 @@ typedef struct
     Position exitPos;                         /**< Dungeon exit position */
     int enemyCount;                           /**< Number of active enemies */
     Position enemies[10];                     /**< Array of enemy positions */
-    int chestCount;                           /**< Number of chests in dungeon */
-    Position chests[5];                       /**< Array of chest positions */
-    int chestOpened;                          /**< Flag if current chest opened */
+    int hasChest;                             /**< Flag if chest exists in dungeon */
+    Position chest;                           /**< Single chest position */
+    int chestOpened;                          /**< Flag if chest opened */
     int enemyFound;                           /**< Enemy discovered flag */
     int bossFound;                            /**< Boss discovered flag */
     Position bossPos;                         /**< Boss position */
@@ -223,19 +223,19 @@ int isPlayerAdjacent(Dungeon *dungeon, int enemyIdx);
 /**
  * @brief Check if a chest exists at the specified position
  *
- * Searches the chest array for a chest at the given coordinates.
+ * Checks if the single chest is at the given coordinates.
  *
  * @param dungeon Pointer to the current dungeon
  * @param x X coordinate to check
  * @param y Y coordinate to check
- * @return Chest index if found, -1 otherwise
+ * @return 1 if chest found at position, 0 otherwise
  */
 int checkChestAt(Dungeon *dungeon, int x, int y);
 
 /**
  * @brief Open a chest at the specified position
  *
- * Opens the chest if one exists at the coordinates,
+ * Opens the chest if it exists at the coordinates,
  * marking it as opened and clearing it from the grid.
  *
  * @param dungeon Pointer to the current dungeon
@@ -246,10 +246,10 @@ int checkChestAt(Dungeon *dungeon, int x, int y);
 int openChest(Dungeon *dungeon, int x, int y);
 
 /**
- * @brief Place random treasure chests in the dungeon
+ * @brief Place a random treasure chest in the dungeon
  *
- * Randomly places 0-3 treasure chests in valid locations
- * (floor tiles not occupied by player, exit, or enemies).
+ * Randomly places at most one treasure chest in a valid location
+ * (floor tile not occupied by player, exit, or enemies).
  *
  * @param dungeon Pointer to the dungeon to populate
  */
