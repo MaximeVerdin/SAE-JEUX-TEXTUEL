@@ -26,7 +26,7 @@ void createGame(char *name, int difficulty, int skipTutorial)
     fprintf(file, "Progress:%d\n", 0);
     fprintf(file, "SkipTutorial:%d\n", skipTutorial);
     fprintf(file, "!\n");
-    fprintf(file, "player;name;health;attack;luck;weapon\n");
+    fprintf(file, "player;name;health;maxHealth;attack;luck;weapon\n");
     fclose(file);
 }
 
@@ -47,10 +47,11 @@ void addPlayersToSave(char *saveName, Player *players, int playerCount)
 
     for (int i = 0; i < playerCount; i++)
     {
-        fprintf(file, "%d;%s;%d;%d;%d;%s\n",
+        fprintf(file, "%d;%s;%d;%d;%d;%d;%s\n",
                 i,
                 players[i].name,
                 players[i].health,
+                players[i].maxHealth,
                 players[i].attack,
                 players[i].luck,
                 players[i].weapon);
@@ -135,14 +136,15 @@ void saveGame(char *saveName, Player *players, int playerCount, int progress, Du
     }
 
     fprintf(file, "!\n");
-    fprintf(file, "player;name;health;attack;luck;weapon\n");
+    fprintf(file, "player;name;health;maxHealth;attack;luck;weapon\n");
 
     for (int i = 0; i < playerCount; i++)
     {
-        fprintf(file, "%d;%s;%d;%d;%d;%s\n",
+        fprintf(file, "%d;%s;%d;%d;%d;%d;%s\n",
                 i,
                 players[i].name,
                 players[i].health,
+                players[i].maxHealth,
                 players[i].attack,
                 players[i].luck,
                 players[i].weapon);
@@ -308,7 +310,7 @@ GameState loadGameState(const char *saveName)
             inPlayerSection = 1;
             continue;
         }
-        /* Parse player data lines (format: index;name;health;attack;luck;weapon) */
+        /* Parse player data lines (format: index;name;health;maxHealth;attack;luck;weapon) */
         else if (inPlayerSection && strstr(buffer, ";") != NULL)
         {
             if (strncmp(buffer, "player;", 7) == 0)
@@ -340,6 +342,11 @@ GameState loadGameState(const char *saveName)
             token = strtok(NULL, ";");
             if (token == NULL)
                 continue;
+            game.players[playerIdx].maxHealth = atoi(token);
+
+            token = strtok(NULL, ";");
+            if (token == NULL)
+                continue;
             game.players[playerIdx].attack = atoi(token);
 
             token = strtok(NULL, ";");
@@ -359,10 +366,11 @@ GameState loadGameState(const char *saveName)
                 game.playerCount = playerIdx + 1;
             }
 
-            printf("Loaded player %d: %s (Health:%d, Attack:%d, Luck:%d, Weapon:%s)\n",
+            printf("Loaded player %d: %s (Health:%d/%d, Attack:%d, Luck:%d, Weapon:%s)\n",
                    playerIdx + 1,
                    game.players[playerIdx].name,
                    game.players[playerIdx].health,
+                   game.players[playerIdx].maxHealth,
                    game.players[playerIdx].attack,
                    game.players[playerIdx].luck,
                    game.players[playerIdx].weapon);

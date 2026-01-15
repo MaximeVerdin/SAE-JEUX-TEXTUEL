@@ -27,6 +27,7 @@ void damagePlayer(Player *player, int damage)
  * @brief Heal a player by a specified amount
  *
  * Increases the player's health by the healing amount.
+ * Health is capped at maxHealth to prevent overhealing.
  *
  * @param player Pointer to the player to heal
  * @param heal Amount of health to restore
@@ -34,6 +35,10 @@ void damagePlayer(Player *player, int damage)
 void healPlayer(Player *player, int heal)
 {
     player->health += heal;
+    if (player->health > player->maxHealth)
+    {
+        player->health = player->maxHealth;
+    }
 }
 
 /**
@@ -96,7 +101,7 @@ void displayPlayer(const Player *player)
     char *translatedWeaponName = getWeaponTranslatedName(player->weapon);
 
     printf("%s: %s\n", translatedPlayerName, player->name);
-    printf("%s: %d\n", translatedHealth, player->health);
+    printf("%s: %d/%d\n", translatedHealth, player->health, player->maxHealth);
     printf("%s: %d\n", translatedAttack, player->attack);
     printf("%s: %d\n", translatedLuck, player->luck);
     printf("%s: %s\n", translatedWeapon, translatedWeaponName);
@@ -127,6 +132,7 @@ Player createPlayer(char name[50], int health, int attack, int luck, char weapon
     strncpy(player.name, name, sizeof(player.name) - 1);
     player.name[sizeof(player.name) - 1] = '\0';
     player.health = health;
+    player.maxHealth = health;
     player.attack = attack;
     player.luck = luck;
     strncpy(player.weapon, weapon, sizeof(player.weapon) - 1);

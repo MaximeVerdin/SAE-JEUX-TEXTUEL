@@ -529,8 +529,8 @@ void exploreDungeon(GameState *game)
         if (result == 2) /* Exit found */
         {
             printf("\n %s\n", congratulations);
-            /* Heal the player for 50% of current health when completing a room */
-            int healAmount = game->players[0].health / 2;
+            /* Heal the player for 40% of maxHealth when completing a room */
+            int healAmount = (game->players[0].maxHealth * 40) / 100;
             if (healAmount > 0)
             {
                 healPlayer(&game->players[0], healAmount);
@@ -560,7 +560,7 @@ void exploreDungeon(GameState *game)
             else
             {
                 printf("%s\n", playerDefeatedRecover);
-                game->players[0].health = 100;
+                game->players[0].health = game->players[0].maxHealth;
             }
         }
         else if (result == 1 || result == 3)

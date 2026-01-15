@@ -17,6 +17,7 @@ typedef struct
 {
     char name[50];   /**< Player name */
     int health;      /**< Player health points */
+    int maxHealth;   /**< Player maximum health points */
     int attack;      /**< Player attack power */
     int luck;        /**< Player luck factor for critical hits */
     char weapon[50]; /**< Currently equipped weapon name */

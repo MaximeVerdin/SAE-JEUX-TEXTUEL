@@ -1,4 +1,4 @@
-gameName: NOM DU JEU
+gameName: The Coridors of Sin
 
 gameLanguage: FR
 
