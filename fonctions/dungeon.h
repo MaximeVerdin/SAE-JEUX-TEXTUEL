@@ -179,8 +179,9 @@ int hasLineOfSight(Dungeon *dungeon, int x1, int y1, int x2, int y2);
  * them toward the player's position with basic pathfinding.
  *
  * @param dungeon Pointer to the current dungeon
+ * @return int Enemy index if an enemy attacked the player (-1 otherwise)
  */
-void updateEnemies(Dungeon *dungeon);
+int updateEnemies(Dungeon *dungeon);
 
 /**
  * @brief Move a specific enemy toward the player
@@ -219,6 +220,17 @@ int canSeePlayer(Dungeon *dungeon, int enemyIdx);
 int isPlayerAdjacent(Dungeon *dungeon, int enemyIdx);
 
 /* ===== Chest Functions ===== */
+
+/**
+ * @brief Ensure the exit is accessible by clearing at least one adjacent floor
+ *
+ * This function checks all 4 adjacent tiles to the exit and converts
+ * one of them to a floor if they are all walls, ensuring the exit
+ * is reachable by the player.
+ *
+ * @param dungeon Pointer to the current dungeon
+ */
+void ensureExitAccess(Dungeon *dungeon);
 
 /**
  * @brief Check if a chest exists at the specified position

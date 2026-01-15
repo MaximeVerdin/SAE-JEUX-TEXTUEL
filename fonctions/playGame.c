@@ -112,6 +112,7 @@ int combat(Player *player, Enemy *enemy)
     char *damageReduced = getTranslatedText("damageReduced");
     char *enemyAttacks = getTranslatedText("enemyAttacks");
     char *playerDefeated = getTranslatedText("playerDefeated");
+    char *combatInvalidChoice = getTranslatedText("combatInvalidChoice");
 
     printf("\n");
     printf(combatStart, player->name, enemy->name);
@@ -133,10 +134,20 @@ int combat(Player *player, Enemy *enemy)
         blocking = 0;
         parried = 0;
 
-        /* Display combat menu and get player choice */
-        displayCombatMenu();
-        int choice;
-        scanf("%d", &choice);
+        /* Display combat menu and get player choice - loop until valid input */
+        int choice = 0;
+        while (choice != 1 && choice != 2)
+        {
+            displayCombatMenu();
+            scanf("%d", &choice);
+
+            if (choice != 1 && choice != 2)
+            {
+                printf("\n");
+                printf("%s", combatInvalidChoice);
+                printf("\n");
+            }
+        }
 
         if (choice == 1)
         {
@@ -186,6 +197,7 @@ int combat(Player *player, Enemy *enemy)
                 free(damageReduced);
                 free(enemyAttacks);
                 free(playerDefeated);
+                free(combatInvalidChoice);
                 return 1;
             }
         }
@@ -233,6 +245,7 @@ int combat(Player *player, Enemy *enemy)
                     free(damageReduced);
                     free(enemyAttacks);
                     free(playerDefeated);
+                    free(combatInvalidChoice);
                     return 1;
                 }
             }
@@ -241,44 +254,6 @@ int combat(Player *player, Enemy *enemy)
                 printf("\n");
                 printf(blockingStance, player->name);
                 printf("\n");
-            }
-        }
-        else
-        {
-            /* Invalid choice - treat as fight */
-            char *invalidChoiceFight = getTranslatedText("invalidChoiceFight");
-            printf("\n");
-            printf(invalidChoiceFight, player->name);
-            printf("\n");
-            free(invalidChoiceFight);
-
-            int playerDamage = player->attack + (rand() % player->luck);
-            enemy->health -= playerDamage;
-            printf(dealsDamage, playerDamage);
-            printf("\n");
-
-            if (enemy->health <= 0)
-            {
-                printf(defeated, enemy->name);
-                printf("\n");
-                free(combatStart);
-                free(enemyInfo);
-                free(yourLuck);
-                free(criticalHit);
-                free(criticalHitText);
-                free(attackText);
-                free(dealsDamage);
-                free(defeated);
-                free(parryTitle);
-                free(parryText);
-                free(noDamageTaken);
-                free(counterAttack);
-                free(parryDefeated);
-                free(blockingStance);
-                free(damageReduced);
-                free(enemyAttacks);
-                free(playerDefeated);
-                return 1;
             }
         }
 
@@ -330,6 +305,7 @@ int combat(Player *player, Enemy *enemy)
             free(damageReduced);
             free(enemyAttacks);
             free(playerDefeated);
+            free(combatInvalidChoice);
             return 0;
         }
     }
@@ -351,6 +327,7 @@ int combat(Player *player, Enemy *enemy)
     free(damageReduced);
     free(enemyAttacks);
     free(playerDefeated);
+    free(combatInvalidChoice);
     return 0;
 }
 
@@ -566,7 +543,29 @@ void exploreDungeon(GameState *game)
         else if (result == 1 || result == 3)
         {
             if (result == 1)
-                updateEnemies(&game->dungeon);
+            {
+                int enemyAttack = updateEnemies(&game->dungeon);
+                if (enemyAttack >= 0)
+                {
+                    /* Enemy attacked player - trigger combat */
+                    printf("\n%s\n", encounterEnemy);
+                    Enemy enemy = createEnemy(game->difficulty);
+                    int victory = combat(&game->players[0], &enemy);
+
+                    if (victory)
+                    {
+                        printf(victoryExp, enemy.experience);
+                        printf("\n");
+                        game->players[0].attack += 2;
+                        removeEnemy(&game->dungeon, enemyAttack);
+                    }
+                    else
+                    {
+                        printf("%s\n", playerDefeatedRecover);
+                        game->players[0].health = game->players[0].maxHealth;
+                    }
+                }
+            }
         }
 
         if (exploring)

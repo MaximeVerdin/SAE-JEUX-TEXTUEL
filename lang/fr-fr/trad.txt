@@ -206,3 +206,6 @@ invalidChoiceFight: Choix invalide! %s attaque à la place!
 # Room completion healing
 roomHealed: Piece complétée! Vous heal pour %d HP.
 
+# Combat invalid choice
+combatInvalidChoice: Choix invalide! Veuillez entrer 1 pour Attaquer ou 2 pour Bloquer.
+

@@ -116,6 +116,7 @@ void displayWeapon(const Weapon *weapon)
 void applyWeaponStats(Player *player, const Weapon *weapon)
 {
     player->attack += weapon->attack;
+    player->maxHealth += weapon->health;
     player->health += weapon->health;
     player->luck += weapon->luck;
 
@@ -154,6 +155,7 @@ void unequipWeapon(Player *player, const Weapon weapons[], int weaponCount)
         {
             /* Subtract the weapon's stats */
             player->attack -= weapons[i].attack;
+            player->maxHealth -= weapons[i].health;
             player->health -= weapons[i].health;
             player->luck -= weapons[i].luck;
 
@@ -283,7 +285,7 @@ void compareWeapons(const Weapon *currentWeapon, const Weapon *newWeapon)
     if (healthDiff != 0)
     {
         printf("    %s: %+d -> %+d (%s%d)\n",
-               statHealth, currentWeapon->attack, newWeapon->health,
+               statHealth, currentWeapon->health, newWeapon->health,
                healthDiff > 0 ? "+" : "", healthDiff);
     }
 

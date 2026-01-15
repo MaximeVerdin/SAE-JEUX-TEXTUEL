@@ -175,6 +175,9 @@ void generateDungeon(Dungeon *dungeon)
         }
     }
 
+    /* Ensure exit is accessible by making at least one adjacent tile a floor */
+    ensureExitAccess(dungeon);
+
     dungeon->enemyCount = 1 + rand() % 3;
     for (int e = 0; e < dungeon->enemyCount; e++)
     {
@@ -311,7 +314,17 @@ void displayDungeon(Dungeon *dungeon)
                         isEnemy = 1;
                     }
                     if (!isEnemy)
-                        printf("%c ", dungeon->grid[i][j]);
+                    {
+                        /* Apply colors to chests, exit, and floor */
+                        if (dungeon->grid[i][j] == CHEST)
+                            printf("\033[1;33m%c\033[0m ", CHEST); /* Gold for chest */
+                        else if (dungeon->grid[i][j] == EXIT)
+                            printf("\033[1;36m%c\033[0m ", EXIT); /* Cyan for exit */
+                        else if (dungeon->grid[i][j] == FLOOR)
+                            printf("\033[0;90m%c\033[0m ", FLOOR); /* Dark gray for floor */
+                        else
+                            printf("%c ", dungeon->grid[i][j]); /* Walls and others */
+                    }
                 }
             }
             else
@@ -320,7 +333,7 @@ void displayDungeon(Dungeon *dungeon)
         printf("\n");
     }
 
-    printf("\n@ Player  E Enemy  X Exit  # Wall  C Chest\n");
+    printf("\n\033[1;32m@\033[0m Player  \033[1;31mE\033[0m Enemy  \033[1;36mX\033[0m Exit  # Wall  \033[1;33mC\033[0m Chest\n");
 }
 
 /**
@@ -532,17 +545,22 @@ int moveEnemyTowardPlayer(Dungeon *dungeon, int enemyIdx)
 /**
  * @brief Update all enemy positions
  */
-void updateEnemies(Dungeon *dungeon)
+int updateEnemies(Dungeon *dungeon)
 {
+    int attackResult = -1;
     for (int e = 0; e < dungeon->enemyCount; e++)
     {
         if (canSeePlayer(dungeon, e))
         {
             int result = moveEnemyTowardPlayer(dungeon, e);
             if (result >= 0)
+            {
                 printf("\n!!! AN ENEMY IS ATTACKING YOU !!!\n");
+                attackResult = result;
+            }
         }
     }
+    return attackResult;
 }
 
 /**
@@ -568,6 +586,39 @@ int openChest(Dungeon *dungeon, int x, int y)
         return 1;
     }
     return 0;
+}
+
+/**
+ * @brief Ensure the exit is accessible by clearing at least one adjacent floor
+ *
+ * This function checks all 4 adjacent tiles to the exit and converts
+ * one of them to a floor if they are all walls, ensuring the exit
+ * is reachable by the player.
+ */
+void ensureExitAccess(Dungeon *dungeon)
+{
+    int ex = dungeon->exitPos.x;
+    int ey = dungeon->exitPos.y;
+
+    /* Check all 4 directions */
+    int directions[4][2] = {{0, -1}, {0, 1}, {-1, 0}, {1, 0}};
+
+    for (int d = 0; d < 4; d++)
+    {
+        int nx = ex + directions[d][0];
+        int ny = ey + directions[d][1];
+
+        /* If valid position and not the player's position */
+        if (nx >= 0 && nx < DUNGEON_SIZE && ny >= 0 && ny < DUNGEON_SIZE)
+        {
+            if (!(nx == dungeon->playerPos.x && ny == dungeon->playerPos.y))
+            {
+                /* Convert this tile to floor to ensure access */
+                dungeon->grid[ny][nx] = FLOOR;
+                break;
+            }
+        }
+    }
 }
 
 /**
