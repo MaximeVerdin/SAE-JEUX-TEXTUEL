@@ -1,53 +1,19 @@
-Bienvenue dans [game_name], devant vous se dresse une aventure épanouissante, mais inexpérimenté que vous êtes, vous avez besoin de MES conseils !
+Vous vous réveillez dans le froid d'un labyrinthe sans fin, où vos souvenirs ne sont plus que des cendres et votre corps l'unique témoin de vos fautes.
 
-On commence avec "Comment vous servir de vos petites jambes fébriles ?", si vous souhaitez vous déplacer à gauche par exemple, vous devez penser très fort à la lettre 'Q' ou appuyer sur la touche 'Q' de votre clavier imaginaire provenant de votre faible cerveau.
+Pour diriger vos pas dans l'obscurité de ces couloirs, utilisez les touches Z, Q, S et D pour vous déplacer vers le haut, la gauche, le bas ou la droite.
 
-Si vous avez au moins 1 neurone, vous pouvez faire de même avec 'D' pour vous déplacer à droite, 'Z' pour aller vers le haut et 'S' pour vous mouvoir vers le bas.
+Chaque recoin peut abriter un vestige de votre passé ou un fragment de votre histoire.
 
-Très bien, je vous laisse vous balader, moi je vais me faire un café, je reviens...
+Restez attentif et utilisez la touche F pour interagir avec les objets, fouiller les coffres ou franchir les seuils qui barrent votre route.
 
-$find_the_chest$
+Sachez que vos péchés prendront corps devant vous, et ils ne vous laisseront pas passer sans un tribut de souffrance.
 
-Oh le coffre de mon grand-père ! Il me manque tellement... Sinon tu vas rester planté là encore longtemps ? Ouvres-le pardi ! T'es sérieux là ? Tu sais pas ouvrir un simple coffre ?
-Il te suffit de réfléchir à la touche "F", faut vraiment tout t'apprendre !
+Pour survivre, vous devrez apprendre à manier le fer.
 
-$open_the_chest$
-$trap_activates$
+La touche E vous permettra d'attaquer vos tourments, tandis que la touche R servira à bloquer leurs assauts pour endurer votre peine.
 
-Une flèche arrive sur vous ! Aïe ! Ça doit faire mal !
+Si la peur vous submerge, la touche A vous permettra de fuir le combat.
 
-Sacré papy, toujours aussi farceur à ce que je vois. 
+N'oubliez jamais que ce que vous refusez d'affronter aujourd'hui continuera de hanter votre esprit jusqu'à la fin de votre sentence.
 
-Oh, mon Dieu ! Il vous a laissé l'épée divine, "Excalibur", elle appartenait au brave chevalier Pilou.
-
-*Bruit de mécanique au loin, qui ressemble à une porte*
-$ouvre_porte_tuto$
-
-Ah bah, on a enfin de la compagnie ! Je commençais à m'ennuyer avec toi. Tu as ton épée, il y a plus qu'à !
-
-Bien, maintenant que vous avez les mêmes capacités qu'un escargot, moi, le seul, l'unique, je vais vous apprendre à vous battre !
-
-Pour cela, tu as 2 choix qui s'opposent à toi, soit tu attaques, soit tu bloques. Après vu la mauviette que tu es, tu vas certainement vouloir t'enfuir. C'est un choix mais je t'oblige à te battre pour cette fois.
-
-"E" te servira pour attaquer, "R" pour bloquer les attaques reçues et "A" pour fuir le combat (pas la peine d'essayer).
-
-Bon courage brave soldat, tu en es presque capable...
-
-$start_fight_tutorial$
-
-$end_fight_tutorial$
-
-Félicitations, tu l'as battu ! Le plus puissant des adversaires...
-Je pense que la sortie devrait être plus loin...
-
-$spot_boss_tutorial$
-
-J'aime beaucoup ta naïveté, ça me divertit beaucoup !
-Voici votre adversaire, [name_boss_tutorial] ! Le plus redoutable des [races_boss_tutorial] !
-Battez-le, et je vous donne la liberté !
-
-$start_tutorial_boss_fight$
-
-$end_tutorial_boss_fight$
-
-La sortie est devant toi champion, fonce ! Une aventure infinissable est devant toi ! Bon courage, je suis si fier de toi !
+Bonne chance à vous.
