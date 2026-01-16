@@ -20,6 +20,7 @@ typedef struct
     int maxHealth;   /**< Player maximum health points */
     int attack;      /**< Player attack power */
     int luck;        /**< Player luck factor for critical hits */
+    int coins;       /**< Player gold coins */
     char weapon[50]; /**< Currently equipped weapon name */
 } Player;
 
@@ -50,6 +51,13 @@ void addAttack(Player *player, int attackBoost);
  * @param luckBoost Amount to increase luck by
  */
 void addLuck(Player *player, int luckBoost);
+
+/**
+ * @brief Add coins to player's wallet
+ * @param player Pointer to the player
+ * @param amount Amount of coins to add
+ */
+void addCoins(Player *player, int amount);
 
 /**
  * @brief Change player's equipped weapon

@@ -69,6 +69,19 @@ void addLuck(Player *player, int luckBoost)
 }
 
 /**
+ * @brief Add coins to player's wallet
+ *
+ * Increases the player's coin count by the specified amount.
+ *
+ * @param player Pointer to the player
+ * @param amount Amount of coins to add
+ */
+void addCoins(Player *player, int amount)
+{
+    player->coins += amount;
+}
+
+/**
  * @brief Change player's equipped weapon
  *
  * Replaces the player's current weapon with a new one.
@@ -87,7 +100,7 @@ void changeWeapon(Player *player, const char *newWeapon)
  * @brief Display player information in console
  *
  * Prints all player attributes including name, health, attack,
- * luck, and weapon.
+ * luck, coins, and weapon.
  *
  * @param player Pointer to the player to display
  */
@@ -97,6 +110,7 @@ void displayPlayer(const Player *player)
     char *translatedHealth = getTranslatedText("statHealth");
     char *translatedAttack = getTranslatedText("statAttack");
     char *translatedLuck = getTranslatedText("statLuck");
+    char *translatedCoins = getTranslatedText("statCoins");
     char *translatedWeapon = getTranslatedText("statWeapon");
     char *translatedWeaponName = getWeaponTranslatedName(player->weapon);
 
@@ -104,12 +118,14 @@ void displayPlayer(const Player *player)
     printf("%s: %d/%d\n", translatedHealth, player->health, player->maxHealth);
     printf("%s: %d\n", translatedAttack, player->attack);
     printf("%s: %d\n", translatedLuck, player->luck);
+    printf("%s: %d\n", translatedCoins, player->coins);
     printf("%s: %s\n", translatedWeapon, translatedWeaponName);
 
     free(translatedPlayerName);
     free(translatedHealth);
     free(translatedAttack);
     free(translatedLuck);
+    free(translatedCoins);
     free(translatedWeapon);
     free(translatedWeaponName);
 }
@@ -135,6 +151,7 @@ Player createPlayer(char name[50], int health, int attack, int luck, char weapon
     player.maxHealth = health;
     player.attack = attack;
     player.luck = luck;
+    player.coins = 0;
     strncpy(player.weapon, weapon, sizeof(player.weapon) - 1);
     player.weapon[sizeof(player.weapon) - 1] = '\0';
 

@@ -8,6 +8,9 @@
 #include "player.h"
 #include "dungeon.h"
 
+/** @brief Total number of available story files */
+#define TOTAL_STORIES 3
+
 /**
  * @brief GameState structure containing all game data
  *
@@ -16,18 +19,22 @@
  */
 typedef struct
 {
-    Player players[4];      /**< Array of players in the game */
-    int playerCount;        /**< Number of active players */
-    int difficulty;         /**< Current difficulty level */
-    int currentLevel;       /**< Current dungeon level */
-    Dungeon dungeon;        /**< Current dungeon state */
-    int tutorialMode;       /**< 1 if tutorial is active */
-    int tutorialStep;       /**< Current tutorial progress */
-    int multiplayer;        /**< 1 if multiplayer mode */
-    int skipTutorial;       /**< 1 if tutorial should be skipped */
-    char saveName[50];      /**< Name of the save file */
-    int bossActive;         /**< 1 if boss is currently spawned */
-    int roomsSinceLastBoss; /**< Counter for rooms completed since last boss */
+    Player players[4];           /**< Array of players in the game */
+    int playerCount;             /**< Number of active players */
+    int difficulty;              /**< Current difficulty level */
+    int currentLevel;            /**< Current dungeon level */
+    Dungeon dungeon;             /**< Current dungeon state */
+    int tutorialMode;            /**< 1 if tutorial is active */
+    int tutorialStep;            /**< Current tutorial progress */
+    int multiplayer;             /**< 1 if multiplayer mode */
+    int skipTutorial;            /**< 1 if tutorial should be skipped */
+    char saveName[50];           /**< Name of the save file */
+    int bossActive;              /**< 1 if boss is currently spawned */
+    int roomsSinceLastBoss;      /**< Counter for rooms completed since last boss */
+    int currentHistoryLine;      /**< Index of next history line to display */
+    int totalHistoryLines;       /**< Total number of history lines loaded */
+    int selectedStory;           /**< Selected story file number (1 to TOTAL_STORIES) */
+    char historyLines[200][512]; /**< Array of all history lines (chapters + narrative) */
 } GameState;
 
 /**
@@ -79,9 +86,11 @@ int loadGameByName(char *saveName);
  * @param roomsSinceLastBoss Rooms completed since last boss
  * @param difficulty Current difficulty level
  * @param multiplayer 1 if multiplayer mode
+ * @param selectedStory Selected story file number
  */
 void saveGame(char *saveName, Player *players, int playerCount, Dungeon *dungeon,
-              int currentLevel, int bossActive, int roomsSinceLastBoss, int difficulty, int multiplayer);
+              int currentLevel, int bossActive, int roomsSinceLastBoss, int difficulty, int multiplayer,
+              int selectedStory);
 
 /**
  * @brief Load a complete game state from save file
@@ -98,4 +107,3 @@ GameState loadGameState(const char *saveName);
 #endif
 
 /* Author names : VERDIN Maxime and FOURNIER Nathan */
-

@@ -10,9 +10,9 @@ Sachez que vos péchés prendront corps devant vous, et ils ne vous laisseront p
 
 Pour survivre, vous devrez apprendre à manier le fer.
 
-La touche E vous permettra d'attaquer vos tourments, tandis que la touche R servira à bloquer leurs assauts pour endurer votre peine.
-
-Si la peur vous submerge, la touche A vous permettra de fuir le combat.
+Dans les combats, vous aurez le choix entre deux actions :
+Appuyez sur 1 pour ATTAQUER vos tourments,
+ou appuyez sur 2 pour BLOQUER leurs assauts et endurer votre peine.
 
 N'oubliez jamais que ce que vous refusez d'affronter aujourd'hui continuera de hanter votre esprit jusqu'à la fin de votre sentence.
 

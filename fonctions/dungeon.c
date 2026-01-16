@@ -9,8 +9,12 @@
 
 /**
  * @brief Initialize a new dungeon for the given level
+ *
+ * @param dungeon Pointer to the dungeon structure to initialize
+ * @param level Current difficulty level
+ * @param generateGrid If 1, generates a new procedural dungeon; if 0, only resets state
  */
-void initDungeon(Dungeon *dungeon, int level)
+void initDungeon(Dungeon *dungeon, int level, int generateGrid)
 {
     for (int i = 0; i < DUNGEON_SIZE; i++)
     {
@@ -28,7 +32,11 @@ void initDungeon(Dungeon *dungeon, int level)
     dungeon->bossFound = 0;
     dungeon->bossPos.x = -1;
     dungeon->bossPos.y = -1;
-    generateDungeon(dungeon);
+
+    if (generateGrid)
+    {
+        generateDungeon(dungeon);
+    }
 }
 
 /**
@@ -179,6 +187,9 @@ void generateDungeon(Dungeon *dungeon)
 
     /* Ensure exit is accessible by making at least one adjacent tile a floor */
     ensureExitAccess(dungeon);
+
+    /* Ensure player is connected to the rest of the dungeon */
+    ensurePlayerAccess(dungeon);
 
     dungeon->enemyCount = 1 + rand() % 3;
     for (int e = 0; e < dungeon->enemyCount; e++)
@@ -432,8 +443,17 @@ int movePlayer(Dungeon *dungeon, char direction)
         return 10 + enemyIdx;
     }
 
+    /* Check if player is trying to access exit - if boss is there, trigger boss encounter */
     if (dungeon->grid[newY][newX] == EXIT)
     {
+        if (dungeon->bossFound)
+        {
+            /* Boss is at the exit - move player to boss position to trigger encounter */
+            dungeon->playerPos.x = newX;
+            dungeon->playerPos.y = newY;
+            updateVision(dungeon);
+            return 4; /* Boss encounter code */
+        }
         printf("You found the exit! Level completed!\n");
         return 2;
     }
@@ -525,7 +545,10 @@ int canSeePlayer(Dungeon *dungeon, int enemyIdx)
 }
 
 /**
- * @brief Move enemy toward player
+ * @brief Move enemy toward player with "cut off" behavior
+ * @note Enemies normally move horizontally OR vertically, never diagonally
+ * @note BUT: Enemies CAN move diagonally when 1 tile away from player (adjacent)
+ * @note Enemies try to cut off the player by aligning their row or column
  */
 int moveEnemyTowardPlayer(Dungeon *dungeon, int enemyIdx)
 {
@@ -535,46 +558,54 @@ int moveEnemyTowardPlayer(Dungeon *dungeon, int enemyIdx)
     if (ex == px && ey == py)
         return enemyIdx;
 
-    int moveX = 0, moveY = 0;
-    if (px < ex)
-        moveX = -1;
-    else if (px > ex)
-        moveX = 1;
-    if (py < ey)
-        moveY = -1;
-    else if (py > ey)
-        moveY = 1;
+    int dx = px - ex;
+    int dy = py - ey;
+    int absDx = abs(dx);
+    int absDy = abs(dy);
 
-    int nx = ex + moveX, ny = ey + moveY;
+    /* Check if enemy is adjacent to player (1 tile away in any direction: cardinal or diagonal) */
+    int isCardinallyAdjacent = ((absDx == 1 && absDy == 0) || (absDx == 0 && absDy == 1));
+    int isDiagonallyAdjacent = (absDx == 1 && absDy == 1);
+    int isAdjacent = isCardinallyAdjacent || isDiagonallyAdjacent;
 
-    if (nx == px && ny == py)
+    /* If adjacent (cardinal or diagonal), move directly to player position to trigger combat */
+    if (isAdjacent && canMoveTo(dungeon, px, py))
     {
+        int nx = px;
+        int ny = py;
         dungeon->grid[ey][ex] = FLOOR;
         dungeon->enemies[enemyIdx].x = nx;
         dungeon->enemies[enemyIdx].y = ny;
-        return enemyIdx;
+        return enemyIdx; /* Return enemyIdx to trigger combat! */
     }
 
-    if (canMoveTo(dungeon, nx, ny))
+    /* Try to "cut off" the player - align with player's row or column first */
+    /* Priority: try to close the larger gap first (more effective cutting off) */
+    int triedHorizontalFirst = 0;
+
+    /* Strategy: If we're not aligned with player, try to align first */
+    if (ex != px && ey != py)
     {
-        dungeon->grid[ey][ex] = FLOOR;
-        dungeon->enemies[enemyIdx].x = nx;
-        dungeon->enemies[enemyIdx].y = ny;
-    }
-    else
-    {
-        int dirs[8][2] = {{moveX, moveY}, {moveX, 0}, {0, moveY}, {-moveX, moveY}, {moveX, -moveY}, {-moveX, 0}, {0, -moveY}, {0, 0}};
-        for (int d = 0; d < 7; d++)
+        /* Not aligned - try to cut off by moving in the direction of larger gap */
+        if (absDx >= absDy)
         {
-            nx = ex + dirs[d][0];
-            ny = ey + dirs[d][1];
-            if (nx == px && ny == py)
+            /* Try horizontal first to align X with player */
+            int nx = ex + (dx > 0 ? 1 : -1);
+            int ny = ey;
+            if (canMoveTo(dungeon, nx, ny))
             {
                 dungeon->grid[ey][ex] = FLOOR;
                 dungeon->enemies[enemyIdx].x = nx;
                 dungeon->enemies[enemyIdx].y = ny;
-                return enemyIdx;
+                return -1;
             }
+            triedHorizontalFirst = 1;
+        }
+        else
+        {
+            /* Try vertical first to align Y with player */
+            int nx = ex;
+            int ny = ey + (dy > 0 ? 1 : -1);
             if (canMoveTo(dungeon, nx, ny))
             {
                 dungeon->grid[ey][ex] = FLOOR;
@@ -584,6 +615,72 @@ int moveEnemyTowardPlayer(Dungeon *dungeon, int enemyIdx)
             }
         }
     }
+
+    /* If aligned on one axis, move along that axis toward player */
+    if (ex == px)
+    {
+        /* Aligned horizontally - move vertically toward player */
+        int ny = ey + (dy > 0 ? 1 : -1);
+        if (canMoveTo(dungeon, ex, ny))
+        {
+            dungeon->grid[ey][ex] = FLOOR;
+            dungeon->enemies[enemyIdx].y = ny;
+            return -1;
+        }
+    }
+    else if (ey == py)
+    {
+        /* Aligned vertically - move horizontally toward player */
+        int nx = ex + (dx > 0 ? 1 : -1);
+        if (canMoveTo(dungeon, nx, ey))
+        {
+            dungeon->grid[ey][ex] = FLOOR;
+            dungeon->enemies[enemyIdx].x = nx;
+            return -1;
+        }
+    }
+
+    /* Try alternative directions - only cardinal (no diagonals) */
+    int dirs[4][2];
+
+    if (triedHorizontalFirst)
+    {
+        /* We tried horizontal, now try vertical directions */
+        dirs[0][0] = 0;
+        dirs[0][1] = (dy > 0 ? 1 : -1); /* vertical toward player */
+        dirs[1][0] = 0;
+        dirs[1][1] = (dy > 0 ? -1 : 1); /* vertical away */
+        dirs[2][0] = (dx > 0 ? 1 : -1);
+        dirs[2][1] = 0; /* horizontal toward player */
+        dirs[3][0] = (dx > 0 ? -1 : 1);
+        dirs[3][1] = 0; /* horizontal away */
+    }
+    else
+    {
+        /* We tried vertical, now try horizontal directions */
+        dirs[0][0] = (dx > 0 ? 1 : -1);
+        dirs[0][1] = 0; /* horizontal toward player */
+        dirs[1][0] = (dx > 0 ? -1 : 1);
+        dirs[1][1] = 0; /* horizontal away */
+        dirs[2][0] = 0;
+        dirs[2][1] = (dy > 0 ? 1 : -1); /* vertical toward player */
+        dirs[3][0] = 0;
+        dirs[3][1] = (dy > 0 ? -1 : 1); /* vertical away */
+    }
+
+    for (int d = 0; d < 4; d++)
+    {
+        int nx = ex + dirs[d][0];
+        int ny = ey + dirs[d][1];
+        if (canMoveTo(dungeon, nx, ny))
+        {
+            dungeon->grid[ey][ex] = FLOOR;
+            dungeon->enemies[enemyIdx].x = nx;
+            dungeon->enemies[enemyIdx].y = ny;
+            return -1;
+        }
+    }
+
     return -1;
 }
 
@@ -733,10 +830,11 @@ Enemy createBoss(int level)
         "Dark Knight", "Shadow Mage", "Beast Master", "Warrior Prime"};
     strcpy(enemy.name, bossNames[rand() % 10]);
 
-    /* Boss stats scale with level - significantly stronger than regular enemies */
-    enemy.health = 80 + (level * 25) + (rand() % 30);
-    enemy.attack = 12 + (level * 4) + (rand() % 10);
-    enemy.experience = 50 + (level * 15);
+    /* Boss stats scale with level - adjusted for better balance
+     * Level 1: HP 50-64, ATK 6-14 (was 80-109, 12-21) */
+    enemy.health = 50 + (level * 15) + (rand() % 15);
+    enemy.attack = 6 + (level * 3) + (rand() % 8);
+    enemy.experience = 30 + (level * 10);
 
     return enemy;
 }
@@ -755,4 +853,176 @@ int checkBossAt(Dungeon *dungeon, int x, int y)
         dungeon->bossPos.x == x && dungeon->bossPos.y == y)
         return 1;
     return 0;
+}
+
+/**
+ * @brief Check if the dungeon is fully connected using flood-fill
+ *
+ * This function verifies that all floor tiles in the dungeon are reachable
+ * from each other using flood-fill (BFS) starting from the player's position.
+ * If the player or exit is isolated, the dungeon generation should be redone.
+ *
+ * @param dungeon Pointer to the current dungeon
+ * @return 1 if dungeon is fully connected, 0 if there are isolated areas
+ */
+int isDungeonConnected(Dungeon *dungeon)
+{
+    /* Create visited array */
+    int visited[DUNGEON_SIZE][DUNGEON_SIZE];
+    for (int i = 0; i < DUNGEON_SIZE; i++)
+        for (int j = 0; j < DUNGEON_SIZE; j++)
+            visited[i][j] = 0;
+
+    /* Queue for BFS */
+    Position queue[DUNGEON_SIZE * DUNGEON_SIZE];
+    int front = 0, back = 0;
+
+    /* Start flood-fill from player's position */
+    Position start = dungeon->playerPos;
+    queue[back++] = start;
+    visited[start.y][start.x] = 1;
+
+    int floorCount = 0;
+    int visitedFloorCount = 0;
+
+    /* Count total floor tiles */
+    for (int i = 0; i < DUNGEON_SIZE; i++)
+    {
+        for (int j = 0; j < DUNGEON_SIZE; j++)
+        {
+            if (dungeon->grid[i][j] == FLOOR || dungeon->grid[i][j] == EXIT ||
+                dungeon->grid[i][j] == CHEST)
+            {
+                floorCount++;
+            }
+        }
+    }
+
+    /* BFS traversal */
+    while (front < back)
+    {
+        Position current = queue[front++];
+        visitedFloorCount++;
+
+        /* Check all 4 neighbors */
+        int directions[4][2] = {{0, -1}, {0, 1}, {-1, 0}, {1, 0}};
+
+        for (int d = 0; d < 4; d++)
+        {
+            int nx = current.x + directions[d][0];
+            int ny = current.y + directions[d][1];
+
+            if (nx >= 0 && nx < DUNGEON_SIZE && ny >= 0 && ny < DUNGEON_SIZE)
+            {
+                char tile = dungeon->grid[ny][nx];
+                int isPassable = (tile == FLOOR || tile == EXIT || tile == CHEST);
+
+                if (isPassable && !visited[ny][nx])
+                {
+                    visited[ny][nx] = 1;
+                    queue[back].x = nx;
+                    queue[back].y = ny;
+                    back++;
+                }
+            }
+        }
+    }
+
+    /* If we visited all floor tiles, the dungeon is connected */
+    return (visitedFloorCount >= floorCount);
+}
+
+/**
+ * @brief Ensure player position is connected to the rest of the dungeon
+ *
+ * If the player's starting position is isolated from the main dungeon,
+ * this function carves a path from the player to the nearest accessible floor.
+ *
+ * @param dungeon Pointer to the current dungeon
+ */
+void ensurePlayerAccess(Dungeon *dungeon)
+{
+    /* Create visited array */
+    int visited[DUNGEON_SIZE][DUNGEON_SIZE];
+    for (int i = 0; i < DUNGEON_SIZE; i++)
+        for (int j = 0; j < DUNGEON_SIZE; j++)
+            visited[i][j] = 0;
+
+    /* Queue for BFS */
+    Position queue[DUNGEON_SIZE * DUNGEON_SIZE];
+    int front = 0, back = 0;
+
+    /* Start BFS from player position */
+    Position start = dungeon->playerPos;
+    queue[back++] = start;
+    visited[start.y][start.x] = 1;
+
+    Position parent[DUNGEON_SIZE][DUNGEON_SIZE];
+    for (int i = 0; i < DUNGEON_SIZE; i++)
+        for (int j = 0; j < DUNGEON_SIZE; j++)
+        {
+            parent[i][j].x = -1;
+            parent[i][j].y = -1;
+        }
+
+    Position foundFloor = {-1, -1};
+    int found = 0;
+
+    /* BFS to find nearest floor tile that's not the player's position */
+    while (front < back && !found)
+    {
+        Position current = queue[front++];
+
+        int directions[4][2] = {{0, -1}, {0, 1}, {-1, 0}, {1, 0}};
+
+        for (int d = 0; d < 4 && !found; d++)
+        {
+            int nx = current.x + directions[d][0];
+            int ny = current.y + directions[d][1];
+
+            if (nx >= 0 && nx < DUNGEON_SIZE && ny >= 0 && ny < DUNGEON_SIZE)
+            {
+                char tile = dungeon->grid[ny][nx];
+                int isPassable = (tile == FLOOR || tile == EXIT || tile == CHEST);
+
+                if (isPassable && !visited[ny][nx])
+                {
+                    visited[ny][nx] = 1;
+                    parent[ny][nx] = current;
+                    queue[back].x = nx;
+                    queue[back].y = ny;
+                    back++;
+
+                    /* If this is a floor tile that's not the player's start, we found a path */
+                    if (tile == FLOOR && (nx != start.x || ny != start.y))
+                    {
+                        foundFloor.x = nx;
+                        foundFloor.y = ny;
+                        found = 1;
+                    }
+                }
+            }
+        }
+    }
+
+    /* If we found a floor tile to connect to, carve the path */
+    if (found)
+    {
+        /* Backtrack from the found floor to the player's position */
+        Position current = foundFloor;
+        while (current.x != start.x || current.y != start.y)
+        {
+            Position prev = parent[current.y][current.x];
+
+            /* If this is not the player's start position, convert to floor */
+            if ((current.x != start.x || current.y != start.y) &&
+                !(current.x == dungeon->exitPos.x && current.y == dungeon->exitPos.y) &&
+                !(current.x == dungeon->chest.x && current.y == dungeon->chest.y))
+            {
+                dungeon->grid[current.y][current.x] = FLOOR;
+            }
+
+            current = prev;
+        }
+    }
 }

@@ -3,12 +3,17 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 #include "saveManagement.h"
 #include "player.h"
 #include "dungeon.h"
 
 /**
  * @brief Create a new game save file
+ *
+ * Initializes a new save file with the given game name,
+ * difficulty setting, and tutorial preference.
+ * Randomly selects a story file for this game.
  */
 void createGame(char *name, int difficulty, int skipTutorial)
 {
@@ -21,6 +26,11 @@ void createGame(char *name, int difficulty, int skipTutorial)
         printf("Error creating game file.\n");
         return;
     }
+
+    /* Randomly select a story (1 to TOTAL_STORIES) */
+    srand((unsigned int)time(NULL));
+    int selectedStory = (rand() % TOTAL_STORIES) + 1;
+
     fprintf(file, "Name:%s\n", name);
     fprintf(file, "Difficulty:%d\n", difficulty);
     fprintf(file, "SkipTutorial:%d\n", skipTutorial);
@@ -28,9 +38,13 @@ void createGame(char *name, int difficulty, int skipTutorial)
     fprintf(file, "BossActive:0\n");
     fprintf(file, "RoomsSinceLastBoss:0\n");
     fprintf(file, "CurrentLevel:1\n");
+    /* Save the randomly selected story number */
+    fprintf(file, "SelectedStory:%d\n", selectedStory);
     fprintf(file, "!\n");
-    fprintf(file, "player;name;health;maxHealth;attack;luck;weapon\n");
+    fprintf(file, "player;name;health;maxHealth;attack;luck;coins;weapon\n");
     fclose(file);
+
+    printf("New game created with story %d\n", selectedStory);
 }
 
 /**
@@ -50,13 +64,14 @@ void addPlayersToSave(char *saveName, Player *players, int playerCount)
 
     for (int i = 0; i < playerCount; i++)
     {
-        fprintf(file, "%d;%s;%d;%d;%d;%d;%s\n",
+        fprintf(file, "%d;%s;%d;%d;%d;%d;%d;%s\n",
                 i,
                 players[i].name,
                 players[i].health,
                 players[i].maxHealth,
                 players[i].attack,
                 players[i].luck,
+                players[i].coins,
                 players[i].weapon);
     }
     fprintf(file, "!\n");
@@ -94,7 +109,8 @@ int loadGameByName(char *saveName)
  * @brief Save the current game state with level progress
  */
 void saveGame(char *saveName, Player *players, int playerCount, Dungeon *dungeon,
-              int currentLevel, int bossActive, int roomsSinceLastBoss, int difficulty, int multiplayer)
+              int currentLevel, int bossActive, int roomsSinceLastBoss, int difficulty, int multiplayer,
+              int selectedStory)
 {
     char fileName[100];
     snprintf(fileName, sizeof(fileName), "saves/%s_save.csv", saveName);
@@ -115,6 +131,9 @@ void saveGame(char *saveName, Player *players, int playerCount, Dungeon *dungeon
     fprintf(file, "Difficulty:%d\n", difficulty);
     fprintf(file, "Multiplayer:%d\n", multiplayer);
     fprintf(file, "SkipTutorial:1\n");
+
+    /* Save selected story */
+    fprintf(file, "SelectedStory:%d\n", selectedStory);
 
     /* Save dungeon state - player position (room number) */
     fprintf(file, "RoomX:%d\n", dungeon->playerPos.x);
@@ -147,17 +166,18 @@ void saveGame(char *saveName, Player *players, int playerCount, Dungeon *dungeon
     }
 
     fprintf(file, "!\n");
-    fprintf(file, "player;name;health;maxHealth;attack;luck;weapon\n");
+    fprintf(file, "player;name;health;maxHealth;attack;luck;coins;weapon\n");
 
     for (int i = 0; i < playerCount; i++)
     {
-        fprintf(file, "%d;%s;%d;%d;%d;%d;%s\n",
+        fprintf(file, "%d;%s;%d;%d;%d;%d;%d;%s\n",
                 i,
                 players[i].name,
                 players[i].health,
                 players[i].maxHealth,
                 players[i].attack,
                 players[i].luck,
+                players[i].coins,
                 players[i].weapon);
     }
 
@@ -178,19 +198,20 @@ GameState loadGameState(const char *saveName)
     game.playerCount = 1;
     game.difficulty = 1;
     game.currentLevel = 1;
-    game.tutorialMode = 0;
     game.tutorialStep = 0;
     game.bossActive = 0;
     game.roomsSinceLastBoss = 0;
     game.multiplayer = 0;
     game.skipTutorial = 1;
+    game.selectedStory = 1; /* Default to story 1 */
+    /* tutorialMode is set based on skipTutorial after loading */
 
     /* Create default player */
     Player defaultPlayer = createPlayer("Hero", 100, 10, 5, "Hands");
     game.players[0] = defaultPlayer;
 
     /* Initialize dungeon - will be overwritten if save has dungeon data */
-    initDungeon(&game.dungeon, 1);
+    initDungeon(&game.dungeon, 1, 1);
 
     char fileName[100];
     snprintf(fileName, sizeof(fileName), "saves/%s_save.csv", saveName);
@@ -284,6 +305,12 @@ GameState loadGameState(const char *saveName)
         {
             game.skipTutorial = atoi(buffer + 13);
         }
+        /* Parse SelectedStory for story selection */
+        else if (strncmp(buffer, "SelectedStory:", 14) == 0)
+        {
+            game.selectedStory = atoi(buffer + 14);
+            printf("Selected Story: %d\n", game.selectedStory);
+        }
         /* Parse RoomX and RoomY for player position */
         else if (strncmp(buffer, "RoomX:", 6) == 0)
         {
@@ -341,7 +368,7 @@ GameState loadGameState(const char *saveName)
             inPlayerSection = 1;
             continue;
         }
-        /* Parse player data lines (format: index;name;health;maxHealth;attack;luck;weapon) */
+        /* Parse player data lines (format: index;name;health;maxHealth;attack;luck;coins;weapon) */
         else if (inPlayerSection && strstr(buffer, ";") != NULL)
         {
             if (strncmp(buffer, "player;", 7) == 0)
@@ -388,6 +415,11 @@ GameState loadGameState(const char *saveName)
             token = strtok(NULL, ";");
             if (token == NULL)
                 continue;
+            game.players[playerIdx].coins = atoi(token);
+
+            token = strtok(NULL, ";");
+            if (token == NULL)
+                continue;
             strncpy(game.players[playerIdx].weapon, token, sizeof(game.players[playerIdx].weapon) - 1);
             game.players[playerIdx].weapon[sizeof(game.players[playerIdx].weapon) - 1] = '\0';
 
@@ -397,13 +429,14 @@ GameState loadGameState(const char *saveName)
                 game.playerCount = playerIdx + 1;
             }
 
-            printf("Loaded player %d: %s (Health:%d/%d, Attack:%d, Luck:%d, Weapon:%s)\n",
+            printf("Loaded player %d: %s (Health:%d/%d, Attack:%d, Luck:%d, Coins:%d, Weapon:%s)\n",
                    playerIdx + 1,
                    game.players[playerIdx].name,
                    game.players[playerIdx].health,
                    game.players[playerIdx].maxHealth,
                    game.players[playerIdx].attack,
                    game.players[playerIdx].luck,
+                   game.players[playerIdx].coins,
                    game.players[playerIdx].weapon);
         }
     }
@@ -413,54 +446,59 @@ GameState loadGameState(const char *saveName)
     /* If we have dungeon grid data, we need to reinitialize with the saved level */
     if (hasGridData)
     {
-        /* Reinitialize dungeon with the saved current level */
-        initDungeon(&game.dungeon, game.currentLevel);
+        /* Reinitialize dungeon with the saved current level but don't regenerate grid */
+        initDungeon(&game.dungeon, game.currentLevel, 0);
 
         /* Re-apply the saved grid data */
-        rewind(file);
-        inGridSection = 0;
-        gridRow = 0;
         file = fopen(fileName, "r");
-
-        while (fgets(buffer, sizeof(buffer), file))
+        if (file)
         {
-            buffer[strcspn(buffer, "\n")] = 0;
+            inGridSection = 0;
+            gridRow = 0;
 
-            if (strcmp(buffer, "Grid:") == 0)
+            while (fgets(buffer, sizeof(buffer), file))
             {
-                inGridSection = 1;
-                gridRow = 0;
-                continue;
-            }
+                buffer[strcspn(buffer, "\n")] = 0;
 
-            if (inGridSection)
-            {
-                if (strcmp(buffer, "!") == 0)
+                if (strcmp(buffer, "Grid:") == 0)
                 {
-                    inGridSection = 0;
+                    inGridSection = 1;
+                    gridRow = 0;
                     continue;
                 }
 
-                if (gridRow < DUNGEON_SIZE && strlen(buffer) >= DUNGEON_SIZE)
+                if (inGridSection)
                 {
-                    if (strchr(buffer, ':') == NULL && strchr(buffer, ';') == NULL)
+                    if (strcmp(buffer, "!") == 0)
                     {
-                        for (int j = 0; j < DUNGEON_SIZE && j < (int)strlen(buffer); j++)
+                        inGridSection = 0;
+                        continue;
+                    }
+
+                    if (gridRow < DUNGEON_SIZE && strlen(buffer) >= DUNGEON_SIZE)
+                    {
+                        if (strchr(buffer, ':') == NULL && strchr(buffer, ';') == NULL)
                         {
-                            game.dungeon.grid[gridRow][j] = buffer[j];
+                            for (int j = 0; j < DUNGEON_SIZE && j < (int)strlen(buffer); j++)
+                            {
+                                game.dungeon.grid[gridRow][j] = buffer[j];
+                            }
+                            gridRow++;
                         }
-                        gridRow++;
                     }
                 }
             }
+            fclose(file);
         }
-        fclose(file);
     }
 
     printf("Game loaded successfully!\n");
 
     /* Update vision based on loaded player position */
     updateVision(&game.dungeon);
+
+    /* Set tutorialMode based on skipTutorial (tutorial is shown if skipTutorial is 0) */
+    game.tutorialMode = !game.skipTutorial;
 
     return game;
 }

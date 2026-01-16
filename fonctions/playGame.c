@@ -380,6 +380,21 @@ void showPlayers(GameState *game)
     free(playerNumber);
 }
 
+/**
+ * @brief Spawn a boss at the exit if this is a boss room
+ *
+ * @param game The game state containing current level and boss state
+ */
+static void trySpawnBoss(GameState *game)
+{
+    /* Boss spawns at levels 5, 10, 15, etc. */
+    if (game->currentLevel % 5 == 0)
+    {
+        spawnBossAtExit(&game->dungeon, game->currentLevel);
+        game->bossActive = 1;
+    }
+}
+
 void handleChestInterface(GameState *game)
 {
     char *chestFound = getTranslatedText("chestFound");
@@ -548,13 +563,64 @@ void exploreDungeon(GameState *game)
                 game->dungeon.bossFound = 0;
                 game->dungeon.bossPos.x = -1;
                 game->dungeon.bossPos.y = -1;
+
+                /* INSTANTLY advance to next room after boss defeat */
+                printf("\n %s\n", congratulations);
+
+                /* Display history line (player survived) */
+                displayHistoryLine(game, 1);
+
+                /* Heal the player for 40% of maxHealth when completing a room */
+                int healAmount = (game->players[0].maxHealth * 40) / 100;
+                if (healAmount > 0)
+                {
+                    healPlayer(&game->players[0], healAmount);
+                }
+
+                /* Increment rooms counter for boss tracking */
+                game->roomsSinceLastBoss++;
+
+                game->currentLevel++;
+
+                initDungeon(&game->dungeon, game->currentLevel, 1);
+                printf("\n");
+                printf(newDungeon, game->currentLevel);
+                printf("\n");
+
+                /* Reset boss state for new room */
+                game->bossActive = 0;
+                game->dungeon.bossFound = 0;
+
+                /* Try to spawn boss for the new room if this is a boss room */
+                trySpawnBoss(game);
             }
             else
             {
                 printf("%s\n", playerDefeatedRecover);
-                game->players[0].health = game->players[0].maxHealth;
-                /* Push player back from boss */
-                game->dungeon.playerPos.y--;
+                /* Player died - go to next room with "???" history */
+                displayHistoryLine(game, 0);
+
+                /* Heal the player for 40% of maxHealth when completing a room */
+                int healAmount = (game->players[0].maxHealth * 40) / 100;
+                if (healAmount > 0)
+                {
+                    healPlayer(&game->players[0], healAmount);
+                }
+
+                /* Increment rooms counter for boss tracking */
+                game->roomsSinceLastBoss++;
+
+                game->currentLevel++;
+
+                initDungeon(&game->dungeon, game->currentLevel, 1);
+                printf("\n");
+                printf(newDungeon, game->currentLevel);
+                printf("\n");
+
+                /* Reset boss state and try to spawn boss for the new room */
+                game->bossActive = 0;
+                game->dungeon.bossFound = 0;
+                trySpawnBoss(game);
             }
         }
         else if (result == 2) /* Exit found */
@@ -569,6 +635,10 @@ void exploreDungeon(GameState *game)
             else
             {
                 printf("\n %s\n", congratulations);
+
+                /* Display history line (player survived) */
+                displayHistoryLine(game, 1);
+
                 /* Heal the player for 40% of maxHealth when completing a room */
                 int healAmount = (game->players[0].maxHealth * 40) / 100;
                 if (healAmount > 0)
@@ -581,10 +651,15 @@ void exploreDungeon(GameState *game)
 
                 game->currentLevel++;
 
-                initDungeon(&game->dungeon, game->currentLevel);
+                initDungeon(&game->dungeon, game->currentLevel, 1);
                 printf("\n");
                 printf(newDungeon, game->currentLevel);
                 printf("\n");
+
+                /* Reset boss state and try to spawn boss for the new room */
+                game->bossActive = 0;
+                game->dungeon.bossFound = 0;
+                trySpawnBoss(game);
             }
         }
         else if (result >= 10) /* Enemy encounter - forced collision! */
@@ -604,7 +679,30 @@ void exploreDungeon(GameState *game)
             else
             {
                 printf("%s\n", playerDefeatedRecover);
-                game->players[0].health = game->players[0].maxHealth;
+                /* Player died - go to next room with "???" history */
+                displayHistoryLine(game, 0);
+
+                /* Heal the player for 40% of maxHealth when completing a room */
+                int healAmount = (game->players[0].maxHealth * 40) / 100;
+                if (healAmount > 0)
+                {
+                    healPlayer(&game->players[0], healAmount);
+                }
+
+                /* Increment rooms counter for boss tracking */
+                game->roomsSinceLastBoss++;
+
+                game->currentLevel++;
+
+                initDungeon(&game->dungeon, game->currentLevel, 1);
+                printf("\n");
+                printf(newDungeon, game->currentLevel);
+                printf("\n");
+
+                /* Reset boss state and try to spawn boss for the new room */
+                game->bossActive = 0;
+                game->dungeon.bossFound = 0;
+                trySpawnBoss(game);
             }
         }
         else if (result == 1 || result == 3)
@@ -629,7 +727,30 @@ void exploreDungeon(GameState *game)
                     else
                     {
                         printf("%s\n", playerDefeatedRecover);
-                        game->players[0].health = game->players[0].maxHealth;
+                        /* Player died - go to next room with "???" history */
+                        displayHistoryLine(game, 0);
+
+                        /* Heal the player for 40% of maxHealth when completing a room */
+                        int healAmount = (game->players[0].maxHealth * 40) / 100;
+                        if (healAmount > 0)
+                        {
+                            healPlayer(&game->players[0], healAmount);
+                        }
+
+                        /* Increment rooms counter for boss tracking */
+                        game->roomsSinceLastBoss++;
+
+                        game->currentLevel++;
+
+                        initDungeon(&game->dungeon, game->currentLevel, 1);
+                        printf("\n");
+                        printf(newDungeon, game->currentLevel);
+                        printf("\n");
+
+                        /* Reset boss state and try to spawn boss for the new room */
+                        game->bossActive = 0;
+                        game->dungeon.bossFound = 0;
+                        trySpawnBoss(game);
                     }
                 }
             }
@@ -678,6 +799,12 @@ void playGame(GameState *game, const char *language)
 
     free(weaponsLoaded);
     free(weaponsWarning);
+
+    /* Display tutorial at game start */
+    displayTutorial();
+
+    /* Load game history chapter lines using the selected story */
+    loadGameHistory(game, game->selectedStory);
 
     char *welcomeTitle = getTranslatedText("welcomeTitle");
     char *exploreInstructions = getTranslatedText("exploreInstructions");
@@ -749,7 +876,8 @@ void playGame(GameState *game, const char *language)
 
         case 4: /* Save */
             saveGame(game->saveName, game->players, game->playerCount, &game->dungeon,
-                     game->currentLevel, game->bossActive, game->roomsSinceLastBoss, game->difficulty, game->multiplayer);
+                     game->currentLevel, game->bossActive, game->roomsSinceLastBoss, game->difficulty, game->multiplayer,
+                     game->selectedStory);
             break;
 
         case 5: /* Return to menu */

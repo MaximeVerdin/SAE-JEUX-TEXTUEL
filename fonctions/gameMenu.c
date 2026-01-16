@@ -114,8 +114,8 @@ void gameMenu()
         free(enterSave);
         scanf("%s", saveName);
 
-        /* Tutorial is always skipped - pass 1 to skip tutorial */
-        createGame(saveName, difficultyChoice, 1);
+        /* Create game - pass 0 to enable tutorial */
+        createGame(saveName, difficultyChoice, 0);
         addPlayersToSave(saveName, &player, playerCount);
 
         char *newGameCreated = getTranslatedText("newGameCreated");
@@ -125,9 +125,6 @@ void gameMenu()
 
         /* Load the saved game state */
         GameState game = loadGameState(saveName);
-
-        /* Tutorial is always disabled */
-        game.tutorialMode = 0;
 
         /* Set the save name for future saves */
         strcpy(game.saveName, saveName);
@@ -151,9 +148,6 @@ void gameMenu()
 
         /* Load the saved game state */
         GameState game = loadGameState(saveName);
-
-        /* Run the game without tutorial */
-        game.tutorialMode = 0;
 
         /* Set the save name for future saves */
         strcpy(game.saveName, saveName);

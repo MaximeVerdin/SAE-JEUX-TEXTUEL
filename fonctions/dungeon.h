@@ -11,6 +11,7 @@
 #define PLAYER '@'      /**< Character representing the player */
 #define ENEMY 'E'       /**< Character representing enemies */
 #define EXIT 'X'        /**< Character representing exit */
+#define BOSS 'B'        /**< Character representing boss */
 #define UNSEEN ' '      /**< Character representing unseen tiles */
 #define CHEST 'C'       /**< Character representing treasure chests */
 
@@ -72,8 +73,9 @@ typedef struct
  *
  * @param dungeon Pointer to the dungeon structure to initialize
  * @param level Current difficulty level
+ * @param generateGrid If 1, generates a new procedural dungeon; if 0, only resets state
  */
-void initDungeon(Dungeon *dungeon, int level);
+void initDungeon(Dungeon *dungeon, int level, int generateGrid);
 
 /**
  * @brief Generate a procedurally created dungeon
@@ -312,5 +314,27 @@ void spawnBossAtExit(Dungeon *dungeon, int level);
  * @return 1 if boss found at position, 0 otherwise
  */
 int checkBossAt(Dungeon *dungeon, int x, int y);
+
+/**
+ * @brief Check if the dungeon is fully connected using flood-fill
+ *
+ * This function verifies that all floor tiles in the dungeon are reachable
+ * from each other using flood-fill (BFS) starting from the player's position.
+ * If the player or exit is isolated, the dungeon generation should be redone.
+ *
+ * @param dungeon Pointer to the current dungeon
+ * @return 1 if dungeon is fully connected, 0 if there are isolated areas
+ */
+int isDungeonConnected(Dungeon *dungeon);
+
+/**
+ * @brief Ensure player position is connected to the rest of the dungeon
+ *
+ * If the player's starting position is isolated from the main dungeon,
+ * this function carves a path from the player to the nearest accessible floor.
+ *
+ * @param dungeon Pointer to the current dungeon
+ */
+void ensurePlayerAccess(Dungeon *dungeon);
 
 #endif

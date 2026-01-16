@@ -9,6 +9,8 @@ Fournier Nathan
 
 [X] Mandotory
 [X] Saving progress
+[X] Combat System
+[X] Procedural Mapping
 
 ## How to compile and play
 

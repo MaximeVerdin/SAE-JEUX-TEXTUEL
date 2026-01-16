@@ -31,7 +31,7 @@ loadSave: Entrez le nom de votre sauvegarde:
 
 # Game menu
 gameMenuTitle: MENU DU JEU
-exploreOption: Explorer (z/haut, s/bas, q/gauche, d/droite)
+exploreOption: Explorer
 displayPlayersOption: Afficher les joueurs
 upgradesOption: Améliorations
 saveOption: Sauvegarder
@@ -74,6 +74,7 @@ playerDefeated: %s a été défait...
 
 # Upgrades menu
 upgradesTitle: AMÉLIORATIONS
+upgradesBalance: Vos pièces d'or: %d
 attackUpgrade: +5 Attaque (100 pièces)
 healthUpgrade: +10 Santé (100 pièces)
 luckUpgrade: +2 Chance (150 pièces)
@@ -83,6 +84,7 @@ upgradeChoice: Votre choix:
 attackIncreased: Attaque augmentée!
 healthRestored: Santé restaurée!
 luckIncreased: Chance augmentée!
+notEnoughCoins: Pas assez de pièces d'or! Il vous faut %d pièces supplémentaires.
 
 # Players display
 playersTitle: JOUEURS (%d/%d)
@@ -92,26 +94,22 @@ playerNumber: Joueur %d:
 weaponComparisonTitle: COMPARAISON D'ARMES
 currentWeapon: ARME ACTUELLE
 newWeapon: NOUVELLE ARME
+currentWeaponLabel: Arme actuelle: %s
+newWeaponLabel: Nouvelle arme:     %s
 statName: Nom
 statAttack: Attaque
 statHealth: Santé
 statLuck: Chance
-
 foundNewWeapon: VOUS AVEZ TROUVÉ UNE NOUVELLE ARME!
-currentWeaponLabel: Arme actuelle: %s
-newWeaponLabel: Nouvelle arme:     %s
-
 equipChoice: Que voulez-vous faire?
 equipNewWeapon: Équiper la nouvelle arme (%s)
 keepCurrentWeapon: Garder votre arme actuelle (%s)
 yourChoice: Votre choix:
-
 equippedWeapon: Vous équipez %s!
 newStats: Vos nouvelles statistiques:
 statsAttack:   Attaque: %d
 statsHealth:   Santé: %d
 statsLuck:     Chance: %d
-
 keepWeapon: Vous gardez %s.
 
 # Summary
@@ -167,7 +165,7 @@ newDungeon: Nouveau donjon généré - Niveau %d
 # Enemy encounters
 encounterEnemy: !!! RENCONTRE AVEC UN ENNEMI !!!
 enemyAttack: !!! UN ENNEMI VOUS ATTAQUE !!!
-victoryExp: Victoire! +%d expérience
+victoryCoins: Victoire! +%d pièces d'or
 playerDefeatedRecover: Vous avez été défait! Récupération...
 
 # Wall collision
@@ -199,6 +197,7 @@ defaultWeapon: Mains nues
 # Player display
 playerName: Nom du joueur
 statWeapon: Arme
+statCoins: Pièces d'or
 
 # Invalid choice
 invalidChoiceFight: Choix invalide! %s attaque à la place!
@@ -214,6 +213,6 @@ bossWarning: !!! BOSS APPROCHE! !!!
 bossEncounter: !!! RENCONTRE AVEC LE BOSS: %s !!!
 bossInfo: %s - Santé: %d, Attaque: %d
 bossDefeated: LE BOSS %s A ÉTÉ VAINCU!
-bossVictory: Victoire épique! +%d expérience
+bossVictory: Victoire épique! +%d pièces d'or
 bossNotDefeated: Vous devez d'abord vaincre le BOSS pour accéder à la sortie!
 

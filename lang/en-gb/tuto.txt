@@ -10,9 +10,9 @@ Be aware that your sins will take physical form before you, and they will not le
 
 To survive, you will have to learn how to fight.
 
-The E key will allow you to attack your tormentors, while the R key will be used to block their attacks and endure your pain.
-
-If fear overtakes you, the A key will allow you to flee the fight.
+In combat, you will have a choice between two actions:
+Press 1 to ATTACK your tormentors,
+or press 2 to BLOCK their attacks and endure your pain.
 
 Never forget that what you refuse to face today will continue to haunt your mind until the end of your sentence.
 
