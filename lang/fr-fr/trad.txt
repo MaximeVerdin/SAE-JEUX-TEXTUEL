@@ -1,0 +1,218 @@
+gameName: The Coridors of Sin
+
+gameLanguage: FR
+
+gameMode: SOLO
+
+newGame: NOUVELLE PARTIE
+
+loadGame: CHARGER PARTIE
+saveGame: SAUVEGARDER PARTIE
+
+skipTutorial: PASSER TUTORIEL
+
+easyDifficulty: DIFFICULTÉ FACILE
+mediumDifficulty: DIFFICULTÉ INTERMÉDIAIRE
+hardDifficulty: DIFFICULTÉ AVANCÉE
+
+name: NOM
+class: CLASSE
+
+# Menu strings
+selectLanguage: Sélectionnez une langue (en/fr):
+languageEn: AN
+languageFr: FR
+
+enterCharacterName: Entrez le nom de votre personnage:
+enterSaveName: Entrez un nom pour votre sauvegarde:
+
+newGameCreated: Nouvelle partie créée pour %s!
+loadSave: Entrez le nom de votre sauvegarde:
+
+# Game menu
+gameMenuTitle: MENU DU JEU
+exploreOption: Explorer
+displayPlayersOption: Afficher les joueurs
+upgradesOption: Améliorations
+saveOption: Sauvegarder
+returnMenuOption: Retour au menu principal
+yourChoice: Votre choix:
+
+# Dungeon
+dungeonTitle: DONJON - Niveau %d
+dungeonDirections: Utilisez z/s/q/d pour vous déplacer
+returnToMenu: Retour au menu
+
+# Combat
+combatTitle: ACTIONS DE COMBAT
+fightOption: Attaquer - Attaquez l'ennemi
+blockOption: Bloquer - Réduisez les dégâts subis de 50%% (chance de parade selon la chance)
+combatYourChoice: Votre choix:
+
+combatStart: COMBAT: %s vs %s
+enemyInfo: %s - Santé: %d, Attaque: %d
+yourLuck: Votre Chance: %d (plus de chance = meilleurs coups critiques et parades)
+
+criticalHit: *** COUP CRITIQUE! ***
+criticalHitText: %s frappe avec une précision mortelle!
+attackText: %s attaque!
+dealsDamage: Inflige %d dégâts!
+
+defeated: %s a été vaincu!
+victoryDefeated: %s a été vaincu!
+
+parryTitle: *** PARADE! ***
+parryText: %s bloque parfaitement l'attaque et riposte!
+noDamageTaken: Aucun dégât subi et vous ripostez!
+counterAttack: La contre-attaque inflige %d dégâts!
+parryDefeated: %s a été vaincu par la contre-parade!
+
+blockingStance: %s adopte une posture défensive! Les dégâts entrants seront réduits.
+damageReduced: %s attaque! Vous bloquez! Dégâts réduits de %d à %d.
+enemyAttacks: %s attaque! Inflige %d dégâts!
+playerDefeated: %s a été défait...
+
+# Upgrades menu
+upgradesTitle: AMÉLIORATIONS
+upgradesBalance: Vos pièces d'or: %d
+attackUpgrade: +5 Attaque (100 pièces)
+healthUpgrade: +10 Santé (100 pièces)
+luckUpgrade: +2 Chance (150 pièces)
+returnOption: Retour
+upgradeChoice: Votre choix:
+
+attackIncreased: Attaque augmentée!
+healthRestored: Santé restaurée!
+luckIncreased: Chance augmentée!
+notEnoughCoins: Pas assez de pièces d'or! Il vous faut %d pièces supplémentaires.
+
+# Players display
+playersTitle: JOUEURS (%d/%d)
+playerNumber: Joueur %d:
+
+# Weapon strings
+weaponComparisonTitle: COMPARAISON D'ARMES
+currentWeapon: ARME ACTUELLE
+newWeapon: NOUVELLE ARME
+currentWeaponLabel: Arme actuelle: %s
+newWeaponLabel: Nouvelle arme:     %s
+statName: Nom
+statAttack: Attaque
+statHealth: Santé
+statLuck: Chance
+foundNewWeapon: VOUS AVEZ TROUVÉ UNE NOUVELLE ARME!
+equipChoice: Que voulez-vous faire?
+equipNewWeapon: Équiper la nouvelle arme (%s)
+keepCurrentWeapon: Garder votre arme actuelle (%s)
+yourChoice: Votre choix:
+equippedWeapon: Vous équipez %s!
+newStats: Vos nouvelles statistiques:
+statsAttack:   Attaque: %d
+statsHealth:   Santé: %d
+statsLuck:     Chance: %d
+keepWeapon: Vous gardez %s.
+
+# Summary
+summaryTitle: RÉSUMÉ
+netChange: Changement net:
+noChange: 0 (Aucun changement)
+detailedChanges: Changements détaillés:
+noStatChanges: (Aucun changement de statistiques)
+
+# Weapon names
+rusty_sword: Épée rouillée
+iron_sword: Épée en fer
+steel_sword: Épée en acier
+diamond_sword: Épée en diamant
+wooden_shield: Bouclier en bois
+iron_shield: Bouclier en fer
+tower_shield: Bouclier de tour
+hunter_bow: Arc de chasseur
+crossbow: Arbalète
+war_axe: Hache de guerre
+magic_staff: Bâton magique
+dagger: Dague
+greatsword: Épée longue
+mace: Masse
+halberd: Hallebarde
+
+# Enemy names
+enemyGoblin: Gobelin
+enemyOrc: Orque
+enemySkeleton: Squelette
+enemyTroll: Troll
+enemyDragon: Dragon
+enemyUnknown: Inconnu
+
+# Chest interaction
+chestFound: COFFRE TROUVÉ!
+chestDescription: Vous avez trouvé un coffre mystérieux.
+chestQuestion: Que voulez-vous faire?
+openChest: Ouvrir le coffre
+leaveChest: Le laisser et continuer
+chestOpened: *** VOUS AVEZ OUVERT LE COFFRE! ***
+chestReward: Vous avez trouvé: %s!
+chestEmpty: Le coffre est déjà vide.
+chestLeave: Vous décidez de laisser le coffre pour plus tard.
+chestInvalid: Choix invalide. Vous laissez le coffre.
+
+# Exploration
+explorePrompt: Direction (z/haut, s/bas, q/gauche, d/droite) ou 1/retour:
+exploreInvalid: Direction invalide! Utilisez z/s/q/d
+congratulations: Félicitations! Vous avez complété le donjon!
+newDungeon: Nouveau donjon généré - Niveau %d
+
+# Enemy encounters
+encounterEnemy: !!! RENCONTRE AVEC UN ENNEMI !!!
+enemyAttack: !!! UN ENNEMI VOUS ATTAQUE !!!
+victoryCoins: Victoire! +%d pièces d'or
+playerDefeatedRecover: Vous avez été défait! Récupération...
+
+# Wall collision
+wallBlocked: Mur! Vous ne pouvez pas passer.
+
+# Exit
+exitFound: Vous avez trouvé la sortie! Niveau complété!
+
+# Welcome messages
+welcomeTitle: BIENVENUE DANS LE JEU
+exploreInstructions: Explorez le donjon pour trouver la sortie (X)
+visionInstructions: Vous ne pouvez voir que ce qui est dans votre champ de vision!
+chestInstructions: Marchez sur un coffre (C) pour obtenir des armes aléatoires avec des statistiques!
+
+# Weapons loaded
+weaponsLoaded: %d armes chargées depuis weapon.csv
+weaponsWarning: Attention: Impossible de charger les armes depuis weapon.csv
+
+# Return to menu
+returningMenu: Retour au menu principal...
+invalidChoice: Choix invalide!
+
+# Dungeon legend
+legend: @ Joueur  E Ennemi  X Sortie  # Mur  C Coffre
+
+# Default weapon
+defaultWeapon: Mains nues
+
+# Player display
+playerName: Nom du joueur
+statWeapon: Arme
+statCoins: Pièces d'or
+
+# Invalid choice
+invalidChoiceFight: Choix invalide! %s attaque à la place!
+
+# Room completion healing
+roomHealed: Piece complétée! Vous heal pour %d HP.
+
+# Combat invalid choice
+combatInvalidChoice: Choix invalide! Veuillez entrer 1 pour Attaquer ou 2 pour Bloquer.
+
+# Boss encounters
+bossWarning: !!! BOSS APPROCHE! !!!
+bossEncounter: !!! RENCONTRE AVEC LE BOSS: %s !!!
+bossInfo: %s - Santé: %d, Attaque: %d
+bossDefeated: LE BOSS %s A ÉTÉ VAINCU!
+bossVictory: Victoire épique! +%d pièces d'or
+bossNotDefeated: Vous devez d'abord vaincre le BOSS pour accéder à la sortie!
+

@@ -1,0 +1,17 @@
+name;attack;health;luck
+rusty_sword;5;0;1
+iron_sword;10;0;2
+steel_sword;15;0;3
+diamond_sword;25;0;5
+wooden_shield;0;10;1
+iron_shield;0;20;2
+tower_shield;0;35;3
+hunter_bow;12;0;4
+crossbow;18;-5;2
+war_axe;20;-10;1
+magic_staff;8;15;4
+dagger;6;0;6
+greatsword;30;-20;0
+mace;14;-3;3
+halberd;22;-8;2
+

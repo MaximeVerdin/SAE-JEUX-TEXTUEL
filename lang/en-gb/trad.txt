@@ -1,0 +1,218 @@
+gameName: The Coridors of Sin
+
+gameLanguage: EN
+
+gameMode: SOLO
+
+newGame: NEW GAME
+
+loadGame: LOAD GAME
+saveGame: SAVE GAME
+
+skipTutorial: SKIP TUTORIAL
+
+easyDifficulty: EASY DIFFICULTY
+mediumDifficulty: MEDIUM DIFFICULTY
+hardDifficulty: HARD DIFFICULTY
+
+name: NAME
+class: CLASS
+
+# Menu strings
+selectLanguage: Select a language (en/fr):
+languageEn: EN
+languageFr: FR
+
+enterCharacterName: Enter your character's name:
+enterSaveName: Enter a name for your save:
+
+newGameCreated: New game created for %s!
+loadSave: Enter the name of your saved game:
+
+# Game menu
+gameMenuTitle: GAME MENU
+exploreOption: Explore (z/up, s/down, q/left, d/right)
+displayPlayersOption: Display players
+upgradesOption: Upgrades
+saveOption: Save
+returnMenuOption: Return to main menu
+yourChoice: Your choice:
+
+# Dungeon
+dungeonTitle: DUNGEON - Level %d
+dungeonDirections: Use z/s/q/d to move
+returnToMenu: Return to menu
+
+# Combat
+combatTitle: COMBAT ACTIONS
+fightOption: Fight - Attack the enemy
+blockOption: Block - Reduce incoming damage by 50%% (parry chance based on luck)
+combatYourChoice: Your choice:
+
+combatStart: COMBAT: %s vs %s
+enemyInfo: %s - Health: %d, Attack: %d
+yourLuck: Your Luck: %d (higher luck = better critical hits and parries)
+
+criticalHit: *** CRITICAL HIT! ***
+criticalHitText: %s strikes with deadly precision!
+attackText: %s attacks!
+dealsDamage: Deals %d damage!
+
+defeated: %s has been defeated!
+victoryDefeated: %s has been defeated!
+
+parryTitle: *** PARRY! ***
+parryText: %s perfectly blocks the attack and counters!
+noDamageTaken: No damage taken and you strike back!
+counterAttack: Counter-attack deals %d damage!
+parryDefeated: %s has been defeated by the parry counter!
+
+blockingStance: %s takes a defensive stance! Incoming damage will be reduced.
+damageReduced: %s attacks! You blocked! Damage reduced from %d to %d.
+enemyAttacks: %s attacks! Deals %d damage!
+playerDefeated: %s has been defeated...
+
+# Upgrades menu
+upgradesTitle: UPGRADES
+upgradesBalance: Your Gold: %d
+attackUpgrade: +5 Attack (100 coins)
+healthUpgrade: +10 Health (100 coins)
+luckUpgrade: +2 Luck (150 coins)
+returnOption: Return
+upgradeChoice: Your choice:
+
+attackIncreased: Attack increased!
+healthRestored: Health restored!
+luckIncreased: Luck increased!
+notEnoughCoins: Not enough gold! You need %d more coins.
+
+# Players display
+playersTitle: PLAYERS (%d/%d)
+playerNumber: Player %d:
+
+# Weapon strings
+weaponComparisonTitle: WEAPON COMPARISON
+currentWeapon: CURRENT WEAPON
+newWeapon: NEW WEAPON
+currentWeaponLabel: Current Weapon: %s
+newWeaponLabel: New Weapon:     %s
+statName: Name
+statAttack: Attack
+statHealth: Health
+statLuck: Luck
+foundNewWeapon: YOU FOUND A NEW WEAPON!
+equipChoice: What would you like to do?
+equipNewWeapon: Equip the new weapon (%s)
+keepCurrentWeapon: Keep your current weapon (%s)
+yourChoice: Your choice:
+equippedWeapon: You equip the %s!
+newStats: Your new stats:
+statsAttack:   Attack: %d
+statsHealth:   Health: %d
+statsLuck:     Luck:   %d
+keepWeapon: You keep your %s.
+
+# Summary
+summaryTitle: SUMMARY
+netChange: Net Change:
+noChange: 0 (No change)
+detailedChanges: Detailed Changes:
+noStatChanges: (No stat changes)
+
+# Weapon names
+rusty_sword: Rusty Sword
+iron_sword: Iron Sword
+steel_sword: Steel Sword
+diamond_sword: Diamond Sword
+wooden_shield: Wooden Shield
+iron_shield: Iron Shield
+tower_shield: Tower Shield
+hunter_bow: Hunter Bow
+crossbow: Crossbow
+war_axe: War Axe
+magic_staff: Magic Staff
+dagger: Dagger
+greatsword: Greatsword
+mace: Mace
+halberd: Halberd
+
+# Enemy names
+enemyGoblin: Goblin
+enemyOrc: Orc
+enemySkeleton: Skeleton
+enemyTroll: Troll
+enemyDragon: Dragon
+enemyUnknown: Unknown Enemy
+
+# Chest interaction
+chestFound: CHEST FOUND!
+chestDescription: You found a mysterious chest.
+chestQuestion: What would you like to do?
+openChest: Open the chest
+leaveChest: Leave it and move on
+chestOpened: *** YOU OPENED THE CHEST! ***
+chestReward: You found: %s!
+chestEmpty: The chest is already empty.
+chestLeave: You decide to leave the chest for later.
+chestInvalid: Invalid choice. You leave the chest.
+
+# Exploration
+explorePrompt: Direction (z/up, s/down, q/left, d/right) or 1/return:
+exploreInvalid: Invalid direction! Use z/s/q/d
+congratulations: Congratulations! You completed the dungeon!
+newDungeon: New dungeon generated - Level %d
+
+# Enemy encounters
+encounterEnemy: !!! ENCOUNTER WITH AN ENEMY !!!
+enemyAttack: !!! AN ENEMY IS ATTACKING YOU !!!
+victoryCoins: Victory! +%d gold
+playerDefeatedRecover: You have been defeated! Recovering...
+
+# Wall collision
+wallBlocked: Wall! You cannot pass.
+
+# Exit
+exitFound: You found the exit! Level completed!
+
+# Welcome messages
+welcomeTitle: WELCOME TO THE GAME
+exploreInstructions: Explore the dungeon to find the exit (X)
+visionInstructions: You can only see what is in your field of vision!
+chestInstructions: Walk on a chest (C) to get random weapons with stats!
+
+# Weapons loaded
+weaponsLoaded: Loaded %d weapons from weapon.csv
+weaponsWarning: Warning: Could not load weapons from weapon.csv
+
+# Return to menu
+returningMenu: Returning to main menu...
+invalidChoice: Invalid choice!
+
+# Dungeon legend
+legend: @ Player  E Enemy  X Exit  # Wall  C Chest
+
+# Default weapon
+defaultWeapon: Fists
+
+# Player display
+playerName: Player Name
+statWeapon: Weapon
+statCoins: Gold Coins
+
+# Invalid choice
+invalidChoiceFight: Invalid choice! %s attacks instead!
+
+# Room completion healing
+roomHealed: Room completed! You heal for %d HP.
+
+# Combat invalid choice
+combatInvalidChoice: Invalid choice! Please enter 1 to Attack or 2 to Block.
+
+# Boss encounters
+bossWarning: !!! BOSS APPROACHING !!!
+bossEncounter: !!! BOSS ENCOUNTER: %s !!!
+bossInfo: %s - Health: %d, Attack: %d
+bossDefeated: BOSS %s HAS BEEN DEFEATED!
+bossVictory: Epic victory! +%d gold
+bossNotDefeated: You must defeat the BOSS first to access the exit!
+
